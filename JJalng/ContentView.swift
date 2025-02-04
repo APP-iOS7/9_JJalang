@@ -11,7 +11,6 @@ import SwiftData
 struct ContentView: View {
     @State private var amount: Double = 0    // 현재 잔고
     @State private var budget: Double = 0  // 목표 잔고 (저장됨)
-    @State private var tempBudget: String = ""
     
     var body: some View {
         TabView {
