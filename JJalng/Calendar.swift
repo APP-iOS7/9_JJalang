@@ -4,7 +4,7 @@ import SwiftData
 struct Calendar: View {
     
     @State private var selectedDate: Date = Date()
-    @State private var outMoney: Int = 10000
+    @Binding var amount: Double
     @State private var inMoney: Int = 200000
     //    private var todosForSelectedDate: [TodoItem] {
     //        todos.filter { todo in
@@ -27,7 +27,7 @@ struct Calendar: View {
                 List {
                     VStack(alignment: .leading) {
                         Text("총 지출 금액").font(.title2).foregroundStyle(.gray)
-                        Text("₩ \(outMoney)").font(.largeTitle).fontWeight(.bold)
+                        Text("₩ \(Int(amount))").font(.largeTitle).fontWeight(.bold)
                         Text("")
                         Text("총 수입 금액").font(.title2).foregroundStyle(.gray)
                         Text("₩ \(inMoney)").font(.largeTitle).fontWeight(.bold)
@@ -49,5 +49,5 @@ struct Calendar: View {
 }
 
 #Preview {
-    Calendar()
+    ContentView()
 }

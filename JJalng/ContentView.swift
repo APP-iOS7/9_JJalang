@@ -20,9 +20,13 @@ struct ContentView: View {
                     Label("홈", systemImage: "house.fill")
                 }
             
-            DetailView(amount: amount)
+            //            DetailView(amount: amount)
+            //                .tabItem {
+            //                    Label("상세 내역", systemImage: "list.bullet")
+            //                }
+            Calendar(amount: $amount)
                 .tabItem {
-                    Label("상세 내역", systemImage: "list.bullet")
+                    Label("달력", systemImage: "calendar")
                 }
         }
     }
@@ -121,23 +125,23 @@ struct HomeView: View {
     }
 }
 
-struct DetailView: View {
-    var amount: Double
-    
-    var body: some View {
-        VStack {
-            Text("상세 내역")
-                .font(.largeTitle)
-                .padding()
-            
-            Text("이번 달 사용 금액: ₩ \(Int(amount))")
-                .font(.title)
-                .padding()
-            
-            Spacer()
-        }
-    }
-}
+//struct DetailView: View {
+//    var amount: Double
+//
+//    var body: some View {
+//        VStack {
+//            Text("상세 내역")
+//                .font(.largeTitle)
+//                .padding()
+//
+//            Text("이번 달 사용 금액: ₩ \(Int(amount))")
+//                .font(.title)
+//                .padding()
+//
+//            Spacer()
+//        }
+//    }
+//}
 
 #Preview {
     ContentView()
