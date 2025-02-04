@@ -80,7 +80,7 @@ struct HomeView: View {
                     // 진행 원 (잔고 원)
                     Circle()
                         .trim(from: 0, to: progressPercentage())
-                        .stroke(AngularGradient(gradient: Gradient(colors: [.green, .yellow]), center: .center), lineWidth: 20)
+                        .stroke(AngularGradient(gradient: Gradient(colors: [.green, .yellow, .green]), center: .center), lineWidth: 20)
                         .rotationEffect(.degrees(-90))  // 12시부터 시작
                         .frame(width: 200, height: 200)
                         .animation(.easeInOut(duration: 1), value: amount)
@@ -90,7 +90,7 @@ struct HomeView: View {
                     VStack {
                         Text("이번 달 사용 금액")
                             .font(.headline)
-                        Text("₩ \(Int(amount))")
+                        Text("₩ \(amount)")
                             .font(.title)
                             .bold()
                             .padding(.top, 10)
@@ -98,7 +98,7 @@ struct HomeView: View {
                 }
                 .padding()
                 
-                Text("/ ₩ \(Int(budget))")
+                Text("/ ₩ \(budget)")
                     .foregroundColor(.gray)
                 
                 Spacer()
@@ -122,7 +122,7 @@ struct HomeView: View {
     }
     
     func progressPercentage() -> CGFloat {
-        return CGFloat(min(Double(amount / budget), 1.0))
+        return CGFloat(min(Double(amount) / Double(budget), 1.0))
     }
 }
 
