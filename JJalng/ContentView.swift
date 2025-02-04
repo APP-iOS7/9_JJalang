@@ -2,7 +2,8 @@
 //  ContentView.swift
 //  JJalng
 //
-//  Created by 김동영 on 2/4/25.
+//  Created by 김동영 on 2/4/25
+//
 //
 
 import SwiftUI
