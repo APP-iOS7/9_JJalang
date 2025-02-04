@@ -57,6 +57,7 @@ struct HomeView: View {
                 }) {
                     Text("설정 완료")
                         .padding()
+                        .fontWeight(.bold)
                         .background(Color.green)
                         .foregroundColor(.white)
                         .cornerRadius(10)
@@ -108,7 +109,7 @@ struct HomeView: View {
                     amount += 50000
                 }) {
                     Text("지출/수입 추가")
-                        .fontWeight(.heavy)
+                        .fontWeight(.bold)
                         .padding()
                         .background(Color.green)
                         .foregroundColor(.white)
