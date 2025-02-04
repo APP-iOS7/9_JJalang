@@ -122,7 +122,7 @@ struct HomeView: View {
     }
     
     func progressPercentage() -> CGFloat {
-        return CGFloat(min(Double(amount / budget), 1.0))
+        return CGFloat(min(Double(amount) / Double(budget), 1.0))
     }
 }
 
