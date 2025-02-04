@@ -12,7 +12,7 @@ struct ContentView: View {
     @State private var amount: Int = 0    // 현재 잔고
     @State private var budget: Int = 0  // 목표 잔고 (저장됨)
     @State private var tempBudget: String = ""
-    
+  
     var body: some View {
         TabView {
             HomeView(amount: $amount, budget: $budget)
@@ -57,6 +57,7 @@ struct HomeView: View {
                 }) {
                     Text("설정 완료")
                         .padding()
+                        .fontWeight(.bold)
                         .background(Color.green)
                         .foregroundColor(.white)
                         .cornerRadius(10)
@@ -108,7 +109,7 @@ struct HomeView: View {
                     amount += 50000
                 }) {
                     Text("지출/수입 추가")
-                        .fontWeight(.heavy)
+                        .fontWeight(.bold)
                         .padding()
                         .background(Color.green)
                         .foregroundColor(.white)
