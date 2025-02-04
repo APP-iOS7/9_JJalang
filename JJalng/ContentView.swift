@@ -80,7 +80,7 @@ struct HomeView: View {
                     // 진행 원 (잔고 원)
                     Circle()
                         .trim(from: 0, to: progressPercentage())
-                        .stroke(AngularGradient(gradient: Gradient(colors: [.green, .yellow]), center: .center), lineWidth: 20)
+                        .stroke(AngularGradient(gradient: Gradient(colors: [.green, .yellow, .green]), center: .center), lineWidth: 20)
                         .rotationEffect(.degrees(-90))  // 12시부터 시작
                         .frame(width: 200, height: 200)
                         .animation(.easeInOut(duration: 1), value: amount)
