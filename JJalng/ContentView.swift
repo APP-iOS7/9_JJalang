@@ -9,9 +9,10 @@ import SwiftUI
 import SwiftData
 
 struct ContentView: View {
-    @State private var amount: Double = 0    // 현재 잔고
-    @State private var budget: Double = 0  // 목표 잔고 (저장됨)
-    
+    @State private var amount: Int = 0    // 현재 잔고
+    @State private var budget: Int = 0  // 목표 잔고 (저장됨)
+    @State private var tempBudget: String = ""
+  
     var body: some View {
         TabView {
             HomeView(amount: $amount, budget: $budget)
@@ -32,8 +33,8 @@ struct ContentView: View {
 }
 
 struct HomeView: View {
-    @Binding var amount: Double
-    @Binding var budget: Double
+    @Binding var amount: Int
+    @Binding var budget: Int
     @State private var tempBudget: String = ""
     
     var body: some View {
@@ -50,7 +51,7 @@ struct HomeView: View {
                     .padding()
                 
                 Button(action: {
-                    if let value = Double(tempBudget), value > 0 {
+                    if let value = Int(tempBudget), value > 0 {
                         budget = value
                     }
                 }) {
@@ -121,7 +122,7 @@ struct HomeView: View {
     }
     
     func progressPercentage() -> CGFloat {
-        return CGFloat(min(amount / budget, 1.0))
+        return CGFloat(min(Double(amount / budget), 1.0))
     }
 }
 

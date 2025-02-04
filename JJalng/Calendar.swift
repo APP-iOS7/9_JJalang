@@ -4,13 +4,8 @@ import SwiftData
 struct Calendar: View {
     
     @State private var selectedDate: Date = Date()
-    @Binding var amount: Double
-    @State private var inMoney: Int = 200000
-    //    private var todosForSelectedDate: [TodoItem] {
-    //        todos.filter { todo in
-    //            todo.dueDate != nil ? Calendar.current.isDate(todo.dueDate!, inSameDayAs: selectedDate) : false
-    //        }
-    //    }
+    @Binding var amount: Int
+
     private func formatDate(selectedDate: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy년 MM월 dd일"
@@ -26,28 +21,27 @@ struct Calendar: View {
                     .environment(\.locale, Locale.init(identifier: "ko"))
                 List {
                     VStack(alignment: .leading) {
+                        Text(formatDate(selectedDate: selectedDate))
+                        Text("")
+
                         Text("총 지출 금액").font(.title2).foregroundStyle(.gray)
                         Text("₩ \(Int(amount))").font(.largeTitle).fontWeight(.bold)
-                        Text("")
-                        Text("총 수입 금액").font(.title2).foregroundStyle(.gray)
-                        Text("₩ \(inMoney)").font(.largeTitle).fontWeight(.bold)
-                        Text("")
-                        Text(formatDate(selectedDate: selectedDate))
                     }
                     
                 }
-                
-                //                List {
-                //                    ForEach(todosForSelectedDate) { todo in
-                //                        TodoRowView(todo: todo)
-                //                    }
-                //                }
-                
             }
         }
     }
 }
 
 #Preview {
-    ContentView()
+    struct PreviewWrapper: View {
+        @State private var amount: Int = 1000  // ✅ @State로 값을 저장
+        
+        var body: some View {
+            Calendar(amount: $amount)  // ✅ $ 붙여서 Binding 전달
+        }
+    }
+    
+    return PreviewWrapper()
 }
