@@ -12,7 +12,7 @@ struct DetailView: View {
     @Environment(\.presentationMode) private var presentationMode
     @Environment(\.modelContext) private var modelContext
     @Binding var moneyStatus: MoneyStatus
-    var selectedAmount: Binding<AmountInfo>?
+    @Binding var selectedAmount: AmountInfo
 
     var body: some View {
         VStack {
@@ -20,31 +20,28 @@ struct DetailView: View {
                 .font(.title)
                 .padding()
             
-            if let selectedAmount = selectedAmount {
-                Text("선택된 금액: ₩ \(selectedAmount.wrappedValue.amount)")
-                    .font(.title2)
-                    .bold()
-                    .padding()
+            // 선택된 Amount 정보 표시
+            Text("선택된 금액: ₩ \(selectedAmount.amount)")
+                .font(.title2)
+                .bold()
+                .padding()
 
-                VStack(alignment: .leading, spacing: 20) {
-                    TextField("메모", text: selectedAmount.memo)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .padding()
-                    
-                    TextField("카테고리", text: Binding(
-                        get: { selectedAmount.wrappedValue.category ?? "" },
-                        set: { selectedAmount.wrappedValue.category = $0.isEmpty ? nil : $0 }
-                    ))
+            VStack(alignment: .leading, spacing: 20) {
+                // 메모 수정
+                TextField("메모", text: $selectedAmount.memo) // Binding으로 메모 수정
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding()
-                    
-                    DatePicker("날짜", selection: selectedAmount.date, displayedComponents: [.date])
-                        .padding()
-                }
-            } else {
-                Text("총 사용 금액: ₩ \(moneyStatus.totalSpent)")
-                    .font(.largeTitle)
-                    .bold()
+
+                // 카테고리 수정
+                TextField("카테고리", text: Binding(
+                    get: { selectedAmount.category ?? "" },
+                    set: { selectedAmount.category = $0.isEmpty ? nil : $0 }
+                ))
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+                .padding()
+
+                // 날짜 수정
+                DatePicker("날짜", selection: $selectedAmount.date, displayedComponents: [.date])
                     .padding()
             }
 
@@ -76,16 +73,18 @@ struct DetailView: View {
     }
     
     private func deleteSelectedAmount() {
-        if let selectedAmount = selectedAmount {
-            if let index = moneyStatus.amount.firstIndex(where: { $0.id == selectedAmount.wrappedValue.id }) {
-                moneyStatus.amount.remove(at: index)
-                try? modelContext.save()
-            }
+        if let index = moneyStatus.amount.firstIndex(where: { $0.id == selectedAmount.id }) {
+            moneyStatus.amount.remove(at: index)
+            try? modelContext.save()
         }
         presentationMode.wrappedValue.dismiss()
     }
     
     private func saveChanges() {
-        try? modelContext.save()
+        do {
+            try modelContext.save()
+        } catch {
+            print("저장 실패: \(error)")
+        }
     }
 }
