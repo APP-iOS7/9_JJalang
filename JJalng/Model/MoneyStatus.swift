@@ -9,11 +9,11 @@ import SwiftData
 import Foundation
 
 @Model
-final class MoneyStatus: Identifiable {
-    var amount: Double
-    var budget: Double
+final class MoneyStatus {
+    var amount: Int
+    var budget: Int
 
-    init(amount: Double = 0.0, budget: Double = 0.0) {
+    init(amount: Int = 0, budget: Int = 0) {
         self.amount = amount
         self.budget = budget
     }

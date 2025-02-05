@@ -9,48 +9,36 @@ import SwiftUI
 import SwiftData
 
 struct DetailView: View {
-    var moneyStatus: MoneyStatus  // 재정 상태
-    var buyHistory: BuyHistory  // 지출 내역
-    
-    @State private var memo: String
-    @State private var category: String?
-    @State private var date: Date?
-    
-    init(moneyStatus: MoneyStatus, buyHistory: BuyHistory) {
-        self.moneyStatus = moneyStatus
-        self.buyHistory = buyHistory
-        _memo = State(initialValue: buyHistory.memo)
-        _category = State(initialValue: buyHistory.category)
-        _date = State(initialValue: buyHistory.date)
-    }
-    
+    @Environment(\.modelContext) private var modelContext
+    @Bindable var buyHistory: BuyHistory  // ✅ SwiftData와 연동되는 바인딩
+
     var body: some View {
         VStack {
             Text("지출 내역")
                 .font(.title)
                 .padding()
             
-            Text("₩ \(Int(moneyStatus.amount))")
+            Text("₩ \(buyHistory.memo)") // ✅ 금액이 아니라 메모가 표시되는 부분 수정
                 .font(.largeTitle)
                 .bold()
                 .padding()
 
             // 폼 구성
             VStack(alignment: .leading, spacing: 20) {
-                TextField("메모", text: $memo)
+                TextField("메모", text: $buyHistory.memo)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding()
 
                 TextField("카테고리", text: Binding(
-                    get: { category ?? "" },
-                    set: { category = $0 }
+                    get: { buyHistory.category ?? "" },
+                    set: { buyHistory.category = $0.isEmpty ? nil : $0 }
                 ))
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding()
 
                 DatePicker("날짜", selection: Binding(
-                    get: { date ?? Date() },
-                    set: { date = $0 }
+                    get: { buyHistory.date ?? Date() },
+                    set: { buyHistory.date = $0 }
                 ), displayedComponents: [.date])
                 .padding()
             }
@@ -86,26 +74,23 @@ struct DetailView: View {
     }
     
     // 변경사항 저장
-    func saveChanges() {
-        buyHistory.memo = memo
-        buyHistory.category = category
-        buyHistory.date = date
+    private func saveChanges() {
+        try? modelContext.save() // ✅ SwiftData에 변경 사항 저장
     }
     
     // 지출 내역 삭제
-    func deleteHistory() {
-        // 실제로 삭제할 때는 DB나 저장소에서 삭제하는 코드를 추가
-        print("지출 내역 삭제: \(buyHistory.id)")
+    private func deleteHistory() {
+        modelContext.delete(buyHistory) // ✅ SwiftData에서 삭제
+        try? modelContext.save()
     }
 }
 
-struct DetailView_Previews: PreviewProvider {
-    static var previews: some View {
-        // 더미 데이터 생성
-        let mockMoneyStatus = MoneyStatus(amount: 100000)
-        let mockBuyHistory = BuyHistory(memo: "저녁식사", category: "식비", date: Date())
-        
-        // DetailView에 더미 데이터를 전달
-        DetailView(moneyStatus: mockMoneyStatus, buyHistory: mockBuyHistory)
-    }
-}
+//#Preview {
+//    let container = try! ModelContainer(for: BuyHistory.self, inMemory: true)
+//    let mockBuyHistory = BuyHistory(memo: "저녁식사", category: "식비", date: Date())
+//    
+//    container.mainContext.insert(mockBuyHistory)
+//
+//    return DetailView(buyHistory: mockBuyHistory)
+//        .modelContainer(container)
+//}
