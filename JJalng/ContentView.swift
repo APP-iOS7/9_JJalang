@@ -11,6 +11,7 @@ import SwiftData
 struct ContentView: View {
     @Query private var moneyStatusList: [MoneyStatus]
     @Environment(\.modelContext) private var modelContext
+    @State private var selectedTab = 0
     
     var moneyStatus: MoneyStatus {
         moneyStatusList.first ?? MoneyStatus(memo: "", date: Date(), amount: 0, budget: 0)
@@ -18,8 +19,8 @@ struct ContentView: View {
     
     var body: some View {
         if let moneyStatus = moneyStatusList.first {
-            TabView {
-                HomeView(moneyStatus: moneyStatus)
+        TabView(selection: $selectedTab) {
+            HomeView(moneyStatus: moneyStatus, selectedTab: $selectedTab)
                     .tabItem {
                         Label("홈", systemImage: "house.fill")
                     }
@@ -47,6 +48,7 @@ struct HomeView: View {
     var moneyStatus: MoneyStatus
     @State private var tempBudget: String = ""
     @State private var showAddTransactionView = false
+    @Binding var selectedTab: Int
     
     var body: some View {
         NavigationStack {
@@ -110,7 +112,7 @@ struct HomeView: View {
                     Spacer()
                     
                     Button(action: {
-                        showAddTransactionView = true // 버튼 클릭
+                        showAddTransactionView = true 
                         moneyStatus.amount += 50000
                         try? modelContext.save()
                     }) {
@@ -122,7 +124,7 @@ struct HomeView: View {
                             .cornerRadius(10)
                     }
                     .navigationDestination(isPresented: $showAddTransactionView) {
-                        AddTransactionView()
+                        AddTransactionView(selectedTab: $selectedTab)
                     }
                     Spacer()
                 }
