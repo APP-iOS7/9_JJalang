@@ -17,8 +17,8 @@ struct BudgetSettingView: View {
             HStack {
                 TextField("예산을 입력하세요", text: $budget)
                     .padding()
-                    .frame(width: 250)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .background(RoundedRectangle(cornerRadius:10)
+                        .fill(Color(.systemGray6)))
                     .keyboardType(.decimalPad)
                 
                 Text("원")
