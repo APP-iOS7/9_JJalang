@@ -13,7 +13,7 @@ struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
     
     var moneyStatus: MoneyStatus {
-        moneyStatusList.first ?? MoneyStatus(memo: "", date: Date(), amount: 0, budget: 0)
+        moneyStatusList.first ?? MoneyStatus(memo: "", date: Date(), amount: [], budget: 0)
     }
     
     var body: some View {
@@ -37,7 +37,7 @@ struct ContentView: View {
     }
     
     private func addInitialMoneyStatus() {
-        let newMoneyStatus = MoneyStatus(memo: "", date: Date(), amount: 0, budget: 0)
+        let newMoneyStatus = MoneyStatus(memo: "", date: Date(), amount: [], budget: 0)
         modelContext.insert(newMoneyStatus)
     }
 }
@@ -90,12 +90,12 @@ struct HomeView: View {
                         .stroke(AngularGradient(gradient: Gradient(colors: [.green, .yellow, .green]), center: .center), lineWidth: 20)
                         .rotationEffect(.degrees(-90))
                         .frame(width: 200, height: 200)
-                        .animation(.easeInOut(duration: 1), value: moneyStatus.amount)
+                        .animation(.easeInOut(duration: 1), value: moneyStatus.totalSpent)
                     
                     VStack {
                         Text("이번 달 사용 금액")
                             .font(.headline)
-                        Text("₩ \(moneyStatus.amount)")
+                        Text("₩ \(moneyStatus.totalSpent)")
                             .font(.title)
                             .bold()
                             .padding(.top, 10)
@@ -108,7 +108,7 @@ struct HomeView: View {
                 Spacer()
                 
                 Button(action: {
-                    moneyStatus.amount += 50000
+                    moneyStatus.amount.append(50000)
                     try? modelContext.save()
                 }) {
                     Text("지출 추가")
@@ -125,7 +125,7 @@ struct HomeView: View {
     }
     
     func progressPercentage() -> CGFloat {
-        return CGFloat(min(Double(moneyStatus.amount) / Double(moneyStatus.budget), 1.0))
+        return CGFloat(min(Double(moneyStatus.totalSpent) / Double(moneyStatus.budget), 1.0))
     }
 }
 
