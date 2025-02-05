@@ -3,6 +3,7 @@
 //  JJalng
 //
 //  Created by 장새벽 on 2/4/25
+
 //
 
 import SwiftUI
@@ -110,4 +111,5 @@ struct HomeView: View {
 #Preview {
     ContentView()
         .modelContainer(for: [MoneyStatus.self], inMemory: true)
+
 }
