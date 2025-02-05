@@ -13,6 +13,7 @@ struct AddTransactionView: View {
     @State private var selectedCategory: String = "🍽️ 식비"
     @State private var isCategoryExpanded: Bool = false
     @State private var navigateToMemoInput:Bool = false
+    @Binding var selectedTab: Int
     
 let categories = [
         "🍽️ 식비",
@@ -136,13 +137,12 @@ let categories = [
                 .padding()
             }
             .navigationDestination(isPresented: $navigateToMemoInput) {
-                // MemoInputView로 이동하며, 필요한 데이터를 전달
-                MemoInputView(amount: amount, category: selectedCategory, date: selectedDate)
+                MemoInputView(amount: amount, category: selectedCategory, date: selectedDate, selectedTab: $selectedTab)
             }
         }
     }
 }
 
 #Preview {
-    AddTransactionView()
+    AddTransactionView(selectedTab: .constant(0))
 }
