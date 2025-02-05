@@ -13,7 +13,9 @@ struct MemoInputView: View {
     let date: Date
     
     @State private var memo: String = ""
-    
+    @Binding var selectedTab: Int
+    @Environment(\.dismiss) private var dismiss
+
     var body: some View {
         VStack {
             Text("메모입력")
@@ -32,8 +34,12 @@ struct MemoInputView: View {
                 // 메모 저장 로직
                 UserDefaults.standard.set(memo, forKey: "userMemo")
                 print("내용이 저장되었습니다: \(memo)")
+                
+                selectedTab = 0 // homeview로 이동
+                dismiss() // 뷰 닫기
+                
             }) {
-                Text("추가 하기")
+                Text("추가")
 //                    .font(.headline)
                     .frame(maxWidth: .infinity)
                     .padding()
@@ -47,6 +53,6 @@ struct MemoInputView: View {
     }
 }
 #Preview {
-    MemoInputView(amount: "10000", category: "🍽️식비", date: Date())
+    MemoInputView(amount: "10000", category: "🍽️식비", date: Date(), selectedTab: .constant(0))
 }
 
