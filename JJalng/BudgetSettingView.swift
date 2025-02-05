@@ -6,8 +6,15 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct BudgetSettingView: View {
+    
+    @Environment(\.modelContext) private var modelContext
+    @Query private var moneyStatusList: [MoneyStatus]
+    var moneyStatus: MoneyStatus {
+        moneyStatusList.first ?? MoneyStatus(memo: "", date: Date(), amount: 0, budget: 0)
+    }
     
     enum BudgetPeriod: String, CaseIterable {
         case oneWeek = "1주"
@@ -37,6 +44,7 @@ struct BudgetSettingView: View {
     @State private var budget: String = ""
     @State private var selectedDate: Int = 0
     @State private var selectedOption: BudgetPeriod = .oneWeek
+
     
     var body: some View {
         VStack {
@@ -100,6 +108,14 @@ struct BudgetSettingView: View {
             Spacer()
             Button(action: {
                 selectedDate = selectedOption.days
+                
+                let formatter = NumberFormatter()
+                formatter.numberStyle = .decimal
+
+                if let formatter = formatter.number(from: budget) {
+                    let num = formatter.intValue
+                    moneyStatus.budget = Int(num)
+                }
                 
                 // 예산 입력 검증: 비어있거나 숫자가 아닌 경우 처리
                 
