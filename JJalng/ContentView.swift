@@ -90,7 +90,7 @@ struct HomeView: View {
                     VStack {
                         Text("이번 달 사용 금액")
                             .font(.headline)
-                        Text("₩ \(Int(amount))")
+                        Text("₩ \(amount)")
                             .font(.title)
                             .bold()
                             .padding(.top, 10)
@@ -98,7 +98,7 @@ struct HomeView: View {
                 }
                 .padding()
                 
-                Text("/ ₩ \(Int(budget))")
+                Text("/ ₩ \(budget)")
                     .foregroundColor(.gray)
                 
                 Spacer()
