@@ -12,6 +12,12 @@ struct MemoInputView: View {
     
     var body: some View {
         VStack {
+            Text("메모입력")
+                .font(.largeTitle)
+                .fontWeight(.bold)
+                .foregroundColor(.black)
+                .padding(.top, 20)
+            
             TextEditor(text: $memo)
                 .padding()
                 .background(Color(.systemGray6))
