@@ -8,6 +8,10 @@
 import SwiftUI
 
 struct MemoInputView: View {
+    let amount: String
+    let category: String
+    let date: Date
+    
     @State private var memo: String = ""
     
     var body: some View {
@@ -27,13 +31,13 @@ struct MemoInputView: View {
             Button(action: {
                 // 메모 저장 로직
                 UserDefaults.standard.set(memo, forKey: "userMemo")
-                print("메모가 저장되었습니다: \(memo)")
+                print("내용이 저장되었습니다: \(memo)")
             }) {
-                Text("메모 저장")
+                Text("추가 하기")
 //                    .font(.headline)
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(Color.yellow)
+                    .background(Color.green)
                     .foregroundColor(.white)
                     .cornerRadius(10)
             }
@@ -43,5 +47,6 @@ struct MemoInputView: View {
     }
 }
 #Preview {
-    MemoInputView()
+    MemoInputView(amount: "10000", category: "🍽️식비", date: Date())
 }
+
