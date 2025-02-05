@@ -37,17 +37,12 @@ struct Calendar: View {
                             }
                     }
                     .contentShape(Rectangle()) // 터치 영역 확장
-                    .background(
-                        NavigationLink(
-                            destination: DetailView(
-                                buyHistory: BuyHistory(memo: "샘플 지출", category: "기타", date: selectedDate)
-                            ),
-                            isActive: $isShowingDetail
-                        ) {
-                            EmptyView()
-                        }
-                            .opacity(0)
-                    )
+                    .navigationTitle("달력")
+                    .navigationDestination(isPresented: $isShowingDetail) {
+                        DetailView(
+                            buyHistory: BuyHistory(memo: "샘플 지출", category: "기타", date: selectedDate)
+                        )
+                    }
                 }
             }
             .navigationTitle("달력")
