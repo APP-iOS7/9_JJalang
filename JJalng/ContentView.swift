@@ -46,84 +46,90 @@ struct HomeView: View {
     @Environment(\.modelContext) private var modelContext
     var moneyStatus: MoneyStatus
     @State private var tempBudget: String = ""
+    @State private var showAddTransactionView = false
     
     var body: some View {
-        VStack {
-            if moneyStatus.budget == 0 {
-                Text("예산을 설정하세요")
-                    .font(.title)
+        NavigationStack {
+            VStack {
+                if moneyStatus.budget == 0 {
+                    Text("예산을 설정하세요")
+                        .font(.title)
+                        .padding()
+                    
+                    TextField("예산 입력 (₩)", text: $tempBudget)
+                        .keyboardType(.numberPad)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .padding()
+                    
+                    Button(action: {
+                        if let value = Int(tempBudget), value > 0 {
+                            moneyStatus.budget = value
+                            try? modelContext.save()
+                        }
+                    }) {
+                        Text("설정 완료")
+                            .padding()
+                            .fontWeight(.bold)
+                            .background(Color.green)
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
+                    }
                     .padding()
-                
-                TextField("예산 입력 (₩)", text: $tempBudget)
-                    .keyboardType(.numberPad)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                } else {
+                    Spacer()
+                    Text("계획")
+                        .font(.largeTitle)
+                        .fontWeight(.heavy)
+                    Spacer()
+                    
+                    ZStack {
+                        Circle()
+                            .stroke(Color.gray.opacity(0.2), lineWidth: 20)
+                            .frame(width: 200, height: 200)
+                        
+                        Circle()
+                            .trim(from: 0, to: progressPercentage())
+                            .stroke(AngularGradient(gradient: Gradient(colors: [.green, .yellow, .green]), center: .center), lineWidth: 20)
+                            .rotationEffect(.degrees(-90))
+                            .frame(width: 200, height: 200)
+                            .animation(.easeInOut(duration: 1), value: moneyStatus.amount)
+                        
+                        VStack {
+                            Text("이번 달 사용 금액")
+                                .font(.headline)
+                            Text("₩ \(moneyStatus.amount)")
+                                .font(.title)
+                                .bold()
+                                .padding(.top, 10)
+                        }
+                    }
                     .padding()
-                
-                Button(action: {
-                    if let value = Int(tempBudget), value > 0 {
-                        moneyStatus.budget = value
+                    
+                    Text("/ ₩ \(moneyStatus.budget)")
+                        .foregroundColor(.gray)
+                    Spacer()
+                    
+                    Button(action: {
+                        showAddTransactionView = true // 버튼 클릭
+                        moneyStatus.amount += 50000
                         try? modelContext.save()
+                    }) {
+                        Text("지출 추가")
+                            .fontWeight(.bold)
+                            .padding()
+                            .background(Color.green)
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
                     }
-                }) {
-                    Text("설정 완료")
-                        .padding()
-                        .fontWeight(.bold)
-                        .background(Color.green)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
-                }
-                .padding()
-            } else {
-                Spacer()
-                Text("계획")
-                    .font(.largeTitle)
-                    .fontWeight(.heavy)
-                Spacer()
-                
-                ZStack {
-                    Circle()
-                        .stroke(Color.gray.opacity(0.2), lineWidth: 20)
-                        .frame(width: 200, height: 200)
-                    
-                    Circle()
-                        .trim(from: 0, to: progressPercentage())
-                        .stroke(AngularGradient(gradient: Gradient(colors: [.green, .yellow, .green]), center: .center), lineWidth: 20)
-                        .rotationEffect(.degrees(-90))
-                        .frame(width: 200, height: 200)
-                        .animation(.easeInOut(duration: 1), value: moneyStatus.amount)
-                    
-                    VStack {
-                        Text("이번 달 사용 금액")
-                            .font(.headline)
-                        Text("₩ \(moneyStatus.amount)")
-                            .font(.title)
-                            .bold()
-                            .padding(.top, 10)
+                    .navigationDestination(isPresented: $showAddTransactionView) {
+                        AddTransactionView()
                     }
+                    Spacer()
                 }
-                .padding()
-                
-                Text("/ ₩ \(moneyStatus.budget)")
-                    .foregroundColor(.gray)
-                Spacer()
-                
-                Button(action: {
-                    moneyStatus.amount += 50000
-                    try? modelContext.save()
-                }) {
-                    Text("지출 추가")
-                        .fontWeight(.bold)
-                        .padding()
-                        .background(Color.green)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
-                }
-                Spacer()
             }
+            .padding()
         }
-        .padding()
     }
-    
     func progressPercentage() -> CGFloat {
         return CGFloat(min(Double(moneyStatus.amount) / Double(moneyStatus.budget), 1.0))
     }
