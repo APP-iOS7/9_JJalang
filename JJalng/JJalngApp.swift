@@ -14,7 +14,6 @@ struct JJalngApp: App {
 
     init() {
         do {
-            // 모델 컨테이너 초기화
             modelContainer = try ModelContainer(for: MoneyStatus.self)
         } catch {
             fatalError("Failed to initialize ModelContainer: \(error)")
