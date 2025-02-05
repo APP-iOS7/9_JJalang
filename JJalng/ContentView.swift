@@ -108,7 +108,7 @@ struct HomeView: View {
                     // 50000원씩 증가
                     amount += 50000
                 }) {
-                    Text("지출/수입 추가")
+                    Text("지출 추가")
                         .fontWeight(.bold)
                         .padding()
                         .background(Color.green)
