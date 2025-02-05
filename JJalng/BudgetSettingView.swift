@@ -12,8 +12,9 @@ struct BudgetSettingView: View {
     
     @Environment(\.modelContext) private var modelContext
     @Query private var moneyStatusList: [MoneyStatus]
-    var moneyStatus: MoneyStatus {
-        moneyStatusList.first ?? MoneyStatus(memo: "", date: Date(), amount: 0, budget: 0)
+    
+    var moneyStatus: MoneyStatus? {
+        moneyStatusList.first
     }
     
     enum BudgetPeriod: String, CaseIterable {
@@ -26,7 +27,6 @@ struct BudgetSettingView: View {
         case sixMonths = "6개월"
         case oneYear = "1년"
         
-        /// 선택된 옵션에 따른 실제 일(day) 값
         var days: Int {
             switch self {
             case .oneWeek: return 7
@@ -45,58 +45,56 @@ struct BudgetSettingView: View {
     @State private var selectedDate: Int = 0
     @State private var selectedOption: BudgetPeriod = .oneWeek
 
-    
     var body: some View {
         VStack {
             Spacer()
-            HStack {
-                VStack {
-                    Text("예산을 며칠동안 쓰시나요?")
-                        .font(.title)
-                        .fontWeight(.bold)
+            VStack {
+                Text("예산을 며칠동안 쓰시나요?")
+                    .font(.title)
+                    .fontWeight(.bold)
+                    .padding()
+                
+                HStack {
+                    Menu {
+                        ForEach(BudgetPeriod.allCases, id: \.self) { option in
+                            Button(option.rawValue) {
+                                selectedOption = option
+                            }
+                        }
+                    } label: {
+                        HStack {
+                            Spacer()
+                            Text(selectedOption.rawValue)
+                                .font(.title2)
+                                .foregroundStyle(.black)
+                                .fontWeight(.bold)
+                            Spacer()
+                            Image(systemName: "chevron.down")
+                                .foregroundStyle(.black)
+                        }
+                        .frame(width: 100)
                         .padding()
-                    HStack {
-                        Menu {
-                            ForEach(BudgetPeriod.allCases, id: \.self) { option in
-                                Button(option.rawValue) {
-                                    selectedOption = option
-                                }
-                            }
-                        }
-                        label: {
-                            HStack {
-                                Spacer()
-                                Text(selectedOption.rawValue)
-                                    .font(.title2)
-                                    .foregroundStyle(.black)
-                                    .fontWeight(.bold)
-                                Spacer()
-                                Image(systemName: "chevron.down")
-                                    .foregroundStyle(.black)
-                            }
-                            .frame(width: 100)
-                            .padding()
-                            .background(Color.gray.opacity(0.2))
-                            .cornerRadius(8)
-                        }
-                        Text("동안").font(.title)
+                        .background(Color.gray.opacity(0.2))
+                        .cornerRadius(8)
                     }
+                    Text("동안").font(.title)
                 }
             }
             Spacer()
+            
             Text("목표 예산을 입력해 주세요.")
                 .font(.title)
                 .fontWeight(.bold)
-            ZStack (alignment: .trailing) {
+            
+            ZStack(alignment: .trailing) {
                 TextField("예산을 입력하세요", text: $budget)
                     .font(.title)
                     .multilineTextAlignment(.center)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .keyboardType(.numberPad)
                     .onChange(of: budget) {
-                        formatInput(&budget)
+                        budget = formatInput(budget)
                     }
-
                 
                 Text("₩")
                     .font(.title2)
@@ -106,30 +104,8 @@ struct BudgetSettingView: View {
             .padding()
             
             Spacer()
-            Button(action: {
-                selectedDate = selectedOption.days
-                
-                let formatter = NumberFormatter()
-                formatter.numberStyle = .decimal
-
-                if let formatter = formatter.number(from: budget) {
-                    let num = formatter.intValue
-                    moneyStatus.budget = Int(num)
-                }
-                
-                // 예산 입력 검증: 비어있거나 숫자가 아닌 경우 처리
-                
-                guard !budget.isEmpty else {
-                    print("예산을 입력해야 합니다.")
-                    return
-                }
-                // 선택된 날짜 저장
-                print("선택된 날짜: \(selectedDate)")
-                
-                // 예산 저장 로직
-                print("예산이 설정되었습니다: \(budget)")
-                
-            }, label: {
+            
+            Button(action: saveBudget) {
                 HStack {
                     Text("저장")
                         .frame(minWidth: 300)
@@ -141,23 +117,46 @@ struct BudgetSettingView: View {
                         .cornerRadius(10)
                 }
                 .frame(width: 400)
-            })
+            }
+            
             Spacer()
         }
         .padding()
+        .onAppear {
+            if let money = moneyStatus {
+                budget = formatInput("\(money.budget)")
+            }
+        }
     }
     
-    private func formatInput(_ text: inout String) {
-        // 숫자만 남기기
+    private func saveBudget() {
+        guard let money = moneyStatus else {
+            print("저장할 데이터가 없습니다.")
+            return
+        }
+        
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+
+        if let formattedNumber = formatter.number(from: budget) {
+            let newBudget = formattedNumber.intValue
+            money.budget = newBudget
+            try? modelContext.save()
+            print("예산이 설정되었습니다: \(newBudget)")
+        } else {
+            print("유효한 숫자가 아닙니다.")
+        }
+    }
+    
+    private func formatInput(_ text: String) -> String {
         let filtered = text.filter { $0.isNumber }
         
         if let number = Int(filtered) {
-            // 3자리마다 , 추가
             let formatter = NumberFormatter()
             formatter.numberStyle = .decimal
-            text = formatter.string(from: NSNumber(value: number)) ?? ""
+            return formatter.string(from: NSNumber(value: number)) ?? ""
         } else {
-            text = ""
+            return ""
         }
     }
 }
@@ -165,4 +164,3 @@ struct BudgetSettingView: View {
 #Preview {
     BudgetSettingView()
 }
-
