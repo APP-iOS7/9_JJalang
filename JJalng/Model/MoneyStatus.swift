@@ -14,10 +14,10 @@ class MoneyStatus {
     var memo: String
     var category: String?
     var date: Date
-    var amount: Int
+    var amount: [Int]
     var budget: Int
 
-    init(memo: String, category: String? = nil, date: Date, amount: Int, budget: Int) {
+    init(memo: String, category: String? = nil, date: Date, amount: [Int] = [], budget: Int) {
         self.id = UUID()  // ✅ 고유한 ID 자동 생성
         self.memo = memo
         self.category = category
@@ -26,7 +26,11 @@ class MoneyStatus {
         self.budget = budget
     }
 
-    var remainingBudget: Int {
-        budget - amount
-    }
+    var totalSpent: Int {
+            amount.reduce(0, +)  // ✅ 전체 사용 금액 계산
+        }
+        
+        var remainingBudget: Int {
+            budget - totalSpent
+        }
 }
