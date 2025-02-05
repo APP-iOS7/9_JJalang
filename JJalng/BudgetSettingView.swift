@@ -88,6 +88,7 @@ struct BudgetSettingView: View {
                     .onChange(of: budget) {
                         formatInput(&budget)
                     }
+
                 
                 Text("₩")
                     .font(.title2)
