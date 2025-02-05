@@ -9,8 +9,10 @@ import SwiftUI
 import SwiftData
 
 struct DetailView: View {
+    @Environment(\.presentationMode) private var presentationMode
     @Environment(\.modelContext) private var modelContext
-    @Bindable var moneyStatus: MoneyStatus  // ✅ 바인딩 추가
+    @Binding var moneyStatus: MoneyStatus
+    var selectedAmount: Binding<AmountInfo>?
 
     var body: some View {
         VStack {
@@ -18,30 +20,34 @@ struct DetailView: View {
                 .font(.title)
                 .padding()
             
-            Text("₩ \(moneyStatus.amount)")
-                .font(.largeTitle)
-                .bold()
-                .padding()
-
-            // 폼 구성
-            VStack(alignment: .leading, spacing: 20) {
-                TextField("메모", text: $moneyStatus.memo)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
+            if let selectedAmount = selectedAmount {
+                Text("선택된 금액: ₩ \(selectedAmount.wrappedValue.amount)")
+                    .font(.title2)
+                    .bold()
                     .padding()
 
-                TextField("카테고리", text: Binding(
-                    get: { moneyStatus.category ?? "" },
-                    set: { moneyStatus.category = $0.isEmpty ? nil : $0 }
-                ))
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .padding()
-
-                DatePicker("날짜", selection: $moneyStatus.date, displayedComponents: [.date])
-                .padding()
+                VStack(alignment: .leading, spacing: 20) {
+                    TextField("메모", text: selectedAmount.memo)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .padding()
+                    
+                    TextField("카테고리", text: Binding(
+                        get: { selectedAmount.wrappedValue.category ?? "" },
+                        set: { selectedAmount.wrappedValue.category = $0.isEmpty ? nil : $0 }
+                    ))
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .padding()
+                    
+                    DatePicker("날짜", selection: selectedAmount.date, displayedComponents: [.date])
+                        .padding()
+                }
+            } else {
+                Text("총 사용 금액: ₩ \(moneyStatus.totalSpent)")
+                    .font(.largeTitle)
+                    .bold()
+                    .padding()
             }
-            .padding()
 
-            // 저장 및 삭제 버튼
             HStack {
                 Button(action: saveChanges) {
                     Text("저장")
@@ -52,9 +58,8 @@ struct DetailView: View {
                         .foregroundColor(.white)
                         .cornerRadius(10)
                 }
-                .padding(.top)
 
-                Button(action: deleteHistory) {
+                Button(action: deleteSelectedAmount) {
                     Text("삭제")
                         .font(.title2)
                         .padding()
@@ -63,31 +68,24 @@ struct DetailView: View {
                         .foregroundColor(.white)
                         .cornerRadius(10)
                 }
-                .padding(.top)
             }
+            .padding(.top)
         }
         .padding()
         .navigationBarTitle("지출 상세", displayMode: .inline)
     }
     
-    // 변경사항 저장
-    private func saveChanges() {
-        try? modelContext.save()  // ✅ 변경 내용 저장
+    private func deleteSelectedAmount() {
+        if let selectedAmount = selectedAmount {
+            if let index = moneyStatus.amount.firstIndex(where: { $0.id == selectedAmount.wrappedValue.id }) {
+                moneyStatus.amount.remove(at: index)
+                try? modelContext.save()
+            }
+        }
+        presentationMode.wrappedValue.dismiss()
     }
     
-    // 지출 내역 삭제
-    private func deleteHistory() {
-        modelContext.delete(moneyStatus)  // ✅ 데이터 삭제
+    private func saveChanges() {
         try? modelContext.save()
     }
 }
-
-//#Preview {
-//    let container = try! ModelContainer(for: BuyHistory.self, inMemory: true)
-//    let mockBuyHistory = BuyHistory(memo: "저녁식사", category: "식비", date: Date())
-//    
-//    container.mainContext.insert(mockBuyHistory)
-//
-//    return DetailView(buyHistory: mockBuyHistory)
-//        .modelContainer(container)
-//}
