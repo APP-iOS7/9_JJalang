@@ -54,8 +54,8 @@ struct HomeView: View {
     @Environment(\.modelContext) private var modelContext
     var moneyStatus: MoneyStatus
     @State private var tempBudget: String = ""
-    @State private var showAddTransactionView = false
     @Binding var selectedTab: Int
+    @State private var showAddTransactionView = false
     
     var body: some View {
         VStack {
@@ -99,6 +99,7 @@ struct HomeView: View {
                 Spacer()
                 
                 Button(action: {
+                    showAddTransactionView = true
                     let newAmountInfo = AmountInfo(amount: 50000)
                     moneyStatus.amount.append(newAmountInfo)
                     try? modelContext.save()
@@ -121,6 +122,8 @@ struct HomeView: View {
     
     func progressPercentage() -> CGFloat {
         return CGFloat(min(Double(moneyStatus.totalSpent) / Double(moneyStatus.budget), 1.0))
+        
+        
     }
 }
 
