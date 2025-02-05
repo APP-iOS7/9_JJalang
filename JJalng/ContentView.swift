@@ -5,6 +5,7 @@ import SwiftData
 struct ContentView: View {
     @Query private var moneyStatusList: [MoneyStatus]
     @Environment(\.modelContext) private var modelContext
+    @State private var selectedTab = 0
     
     var moneyStatus: MoneyStatus {
         moneyStatusList.first ?? MoneyStatus(memo: "", date: Date(), amount: [], budget: 0)
@@ -12,8 +13,8 @@ struct ContentView: View {
     
     var body: some View {
         if let moneyStatus = moneyStatusList.first {
-            TabView {
-                HomeView(moneyStatus: moneyStatus)
+        TabView(selection: $selectedTab) {
+            HomeView(moneyStatus: moneyStatus, selectedTab: $selectedTab)
                     .tabItem {
                         Label("홈", systemImage: "house.fill")
                     }
@@ -40,6 +41,8 @@ struct HomeView: View {
     @Environment(\.modelContext) private var modelContext
     var moneyStatus: MoneyStatus
     @State private var tempBudget: String = ""
+    @State private var showAddTransactionView = false
+    @Binding var selectedTab: Int
     
     var body: some View {
         VStack {
@@ -72,9 +75,12 @@ struct HomeView: View {
                             .bold()
                             .padding(.top, 10)
                     }
+                    .navigationDestination(isPresented: $showAddTransactionView) {
+                        AddTransactionView(selectedTab: $selectedTab)
+                    }
+                    Spacer()
                 }
                 .padding()
-                
                 Text("/ ₩ \(moneyStatus.budget)")
                     .foregroundColor(.gray)
                 Spacer()
@@ -93,10 +99,9 @@ struct HomeView: View {
                 }
                 Spacer()
             }
+            .padding()
         }
-        .padding()
     }
-    
     func progressPercentage() -> CGFloat {
         return CGFloat(min(Double(moneyStatus.totalSpent) / Double(moneyStatus.budget), 1.0))
     }
