@@ -1,9 +1,3 @@
-//
-//  SwiftUIView.swift
-//  JJalng
-//
-//  Created by Saebyeok Jang on 2/4/25.
-//
 
 import SwiftUI
 import SwiftData
@@ -50,29 +44,7 @@ struct HomeView: View {
     var body: some View {
         VStack {
             if moneyStatus.budget == 0 {
-                Text("예산을 설정하세요")
-                    .font(.title)
-                    .padding()
-                
-                TextField("예산 입력 (₩)", text: $tempBudget)
-                    .keyboardType(.numberPad)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .padding()
-                
-                Button(action: {
-                    if let value = Int(tempBudget), value > 0 {
-                        moneyStatus.budget = value
-                        try? modelContext.save()
-                    }
-                }) {
-                    Text("설정 완료")
-                        .padding()
-                        .fontWeight(.bold)
-                        .background(Color.green)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
-                }
-                .padding()
+                BudgetSettingView()
             } else {
                 Spacer()
                 Text("계획")
@@ -133,4 +105,5 @@ struct HomeView: View {
 #Preview {
     ContentView()
         .modelContainer(for: [MoneyStatus.self], inMemory: true)
+
 }
