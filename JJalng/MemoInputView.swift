@@ -36,7 +36,7 @@ struct MemoInputView: View {
                 print("내용이 저장되었습니다: \(memo)")
                 
                 selectedTab = 0 // homeview로 이동
-                dismiss() // 뷰 닫기
+                dismiss() // 
                 
             }) {
                 Text("추가")
