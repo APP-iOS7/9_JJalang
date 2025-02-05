@@ -17,6 +17,7 @@ final class BuyHistory: Identifiable {
     var createAt: Date?
     
     init(id: UUID = UUID(), memo: String, category: String? = nil, date: Date? = nil, createAt: Date? = nil) {
+        print(id)
         self.id = id
         self.memo = memo
         self.category = category
