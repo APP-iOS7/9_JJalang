@@ -1,9 +1,3 @@
-//
-//  ContentView.swift
-//  JJalng
-//
-//  Created by 장새벽 on 2/4/25
-//
 
 import SwiftUI
 import SwiftData
@@ -14,7 +8,7 @@ struct ContentView: View {
     @State private var selectedTab = 0
     
     var moneyStatus: MoneyStatus {
-        moneyStatusList.first ?? MoneyStatus(memo: "", date: Date(), amount: 0, budget: 0)
+        moneyStatusList.first ?? MoneyStatus(memo: "", date: Date(), amount: [], budget: 0)
     }
     
     var body: some View {
@@ -38,7 +32,7 @@ struct ContentView: View {
     }
     
     private func addInitialMoneyStatus() {
-        let newMoneyStatus = MoneyStatus(memo: "", date: Date(), amount: 0, budget: 0)
+        let newMoneyStatus = MoneyStatus(memo: "", date: Date(), amount: [], budget: 0)
         modelContext.insert(newMoneyStatus)
     }
 }
@@ -51,93 +45,70 @@ struct HomeView: View {
     @Binding var selectedTab: Int
     
     var body: some View {
-        NavigationStack {
-            VStack {
-                if moneyStatus.budget == 0 {
-                    Text("예산을 설정하세요")
-                        .font(.title)
-                        .padding()
+        VStack {
+            if moneyStatus.budget == 0 {
+                BudgetSettingView()
+            } else {
+                Spacer()
+                Text("계획")
+                    .font(.largeTitle)
+                    .fontWeight(.heavy)
+                Spacer()
+                
+                ZStack {
+                    Circle()
+                        .stroke(Color.gray.opacity(0.2), lineWidth: 20)
+                        .frame(width: 200, height: 200)
                     
-                    TextField("예산 입력 (₩)", text: $tempBudget)
-                        .keyboardType(.numberPad)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .padding()
+                    Circle()
+                        .trim(from: 0, to: progressPercentage())
+                        .stroke(AngularGradient(gradient: Gradient(colors: [.green, .yellow, .green]), center: .center), lineWidth: 20)
+                        .rotationEffect(.degrees(-90))
+                        .frame(width: 200, height: 200)
+                        .animation(.easeInOut(duration: 1), value: moneyStatus.totalSpent)
                     
-                    Button(action: {
-                        if let value = Int(tempBudget), value > 0 {
-                            moneyStatus.budget = value
-                            try? modelContext.save()
-                        }
-                    }) {
-                        Text("설정 완료")
-                            .padding()
-                            .fontWeight(.bold)
-                            .background(Color.green)
-                            .foregroundColor(.white)
-                            .cornerRadius(10)
-                    }
-                    .padding()
-                } else {
-                    Spacer()
-                    Text("계획")
-                        .font(.largeTitle)
-                        .fontWeight(.heavy)
-                    Spacer()
-                    
-                    ZStack {
-                        Circle()
-                            .stroke(Color.gray.opacity(0.2), lineWidth: 20)
-                            .frame(width: 200, height: 200)
-                        
-                        Circle()
-                            .trim(from: 0, to: progressPercentage())
-                            .stroke(AngularGradient(gradient: Gradient(colors: [.green, .yellow, .green]), center: .center), lineWidth: 20)
-                            .rotationEffect(.degrees(-90))
-                            .frame(width: 200, height: 200)
-                            .animation(.easeInOut(duration: 1), value: moneyStatus.amount)
-                        
-                        VStack {
-                            Text("이번 달 사용 금액")
-                                .font(.headline)
-                            Text("₩ \(moneyStatus.amount)")
-                                .font(.title)
-                                .bold()
-                                .padding(.top, 10)
-                        }
-                    }
-                    .padding()
-                    
-                    Text("/ ₩ \(moneyStatus.budget)")
-                        .foregroundColor(.gray)
-                    Spacer()
-                    
-                    Button(action: {
-                        showAddTransactionView = true 
-                        moneyStatus.amount += 50000
-                        try? modelContext.save()
-                    }) {
-                        Text("지출 추가")
-                            .fontWeight(.bold)
-                            .padding()
-                            .background(Color.green)
-                            .foregroundColor(.white)
-                            .cornerRadius(10)
+                    VStack {
+                        Text("이번 달 사용 금액")
+                            .font(.headline)
+                        Text("₩ \(moneyStatus.totalSpent)")
+                            .font(.title)
+                            .bold()
+                            .padding(.top, 10)
                     }
                     .navigationDestination(isPresented: $showAddTransactionView) {
                         AddTransactionView(selectedTab: $selectedTab)
                     }
                     Spacer()
                 }
+                .padding()
+                Text("/ ₩ \(moneyStatus.budget)")
+                    .foregroundColor(.gray)
+                Spacer()
+                
+                Button(action: {
+                    let newAmountInfo = AmountInfo(amount: 50000)
+                    moneyStatus.amount.append(newAmountInfo)
+                    try? modelContext.save()
+                }) {
+                    Text("지출 추가")
+                        .fontWeight(.bold)
+                        .padding()
+                        .background(Color.green)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                }
+                Spacer()
             }
             .padding()
         }
     }
     func progressPercentage() -> CGFloat {
-        return CGFloat(min(Double(moneyStatus.amount) / Double(moneyStatus.budget), 1.0))
+        return CGFloat(min(Double(moneyStatus.totalSpent) / Double(moneyStatus.budget), 1.0))
     }
 }
 
 #Preview {
     ContentView()
         .modelContainer(for: [MoneyStatus.self], inMemory: true)
+
 }
