@@ -7,27 +7,33 @@ struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
     @State private var selectedTab = 0
     
-    var moneyStatus: MoneyStatus {
-        moneyStatusList.first ?? MoneyStatus(memo: "", date: Date(), amount: [], budget: 0)
+    var moneyStatus: MoneyStatus? {
+        moneyStatusList.first
     }
     
     var body: some View {
-        if let moneyStatus = moneyStatusList.first {
-        TabView(selection: $selectedTab) {
-            HomeView(moneyStatus: moneyStatus, selectedTab: $selectedTab)
-                    .tabItem {
-                        Label("홈", systemImage: "house.fill")
-                    }
-                CalendarView()
-                    .tabItem {
-                        Label("달력", systemImage: "calendar")
+        NavigationStack {
+            if let moneyStatus = moneyStatusList.first {
+                TabView(selection: $selectedTab) {
+                    HomeView(moneyStatus: moneyStatus, selectedTab: $selectedTab)
+                        .tabItem {
+                            Label("홈", systemImage: "house.fill")
+                        }
+                        .tag(0)
+                    
+                    CalendarView()
+                        .tabItem {
+                            Label("달력", systemImage: "calendar")
+                        }
+                        .tag(1)
+                }
+                .navigationBarTitleDisplayMode(.inline)
+            } else {
+                Text("데이터를 불러오는 중...")
+                    .onAppear {
+                        addInitialMoneyStatus()
                     }
             }
-        } else {
-            Text("데이터를 불러오는 중...")
-                .onAppear {
-                    addInitialMoneyStatus()
-                }
         }
     }
     
@@ -101,6 +107,7 @@ struct HomeView: View {
             }
         }
     }
+    
     func progressPercentage() -> CGFloat {
         return CGFloat(min(Double(moneyStatus.totalSpent) / Double(moneyStatus.budget), 1.0))
     }
@@ -109,5 +116,4 @@ struct HomeView: View {
 #Preview {
     ContentView()
         .modelContainer(for: [MoneyStatus.self], inMemory: true)
-
 }

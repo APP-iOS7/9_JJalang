@@ -35,7 +35,7 @@ class MoneyStatus {
     }
 }
 
-@Model  // ✅ SwiftData에서 관리 가능하도록 @Model 추가
+@Model
 class AmountInfo: Identifiable {
     var id: UUID
     var amount: Int
