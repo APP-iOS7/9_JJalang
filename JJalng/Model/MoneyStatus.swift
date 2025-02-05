@@ -10,7 +10,7 @@ import Foundation
 
 @Model
 class MoneyStatus {
-    var id: UUID
+    var id: String = UUID().uuidString
     var memo: String
     var category: String?
     var date: Date
@@ -18,7 +18,6 @@ class MoneyStatus {
     var budget: Int
 
     init(memo: String, category: String? = nil, date: Date, amount: [AmountInfo] = [], budget: Int) {
-        self.id = UUID()
         self.memo = memo
         self.category = category
         self.date = date
@@ -26,25 +25,24 @@ class MoneyStatus {
         self.budget = budget
     }
 
-    var totalSpent: Int {
+    var totalSpent: Int {   // 전체 소비
         amount.reduce(0) { $0 + $1.amount }
     }
 
-    var remainingBudget: Int {
+    var remainingBudget: Int {  
         budget - totalSpent
     }
 }
 
 @Model
 class AmountInfo: Identifiable {
-    var id: UUID
+    var id: String = UUID().uuidString
     var amount: Int
     var memo: String
     var category: String?
     var date: Date
 
     init(amount: Int, memo: String = "", category: String? = nil, date: Date = Date()) {
-        self.id = UUID()
         self.amount = amount
         self.memo = memo
         self.category = category
