@@ -10,7 +10,7 @@ import Foundation
 
 @Model
 class MoneyStatus {
-    var id: UUID  // ✅ 수동으로 UUID 추가
+    var id: UUID
     var memo: String
     var category: String?
     var date: Date
@@ -18,7 +18,7 @@ class MoneyStatus {
     var budget: Int
 
     init(memo: String, category: String? = nil, date: Date, amount: [Int] = [], budget: Int) {
-        self.id = UUID()  // ✅ 고유한 ID 자동 생성
+        self.id = UUID()
         self.memo = memo
         self.category = category
         self.date = date
@@ -27,7 +27,7 @@ class MoneyStatus {
     }
 
     var totalSpent: Int {
-            amount.reduce(0, +)  // ✅ 전체 사용 금액 계산
+            amount.reduce(0, +)
         }
         
         var remainingBudget: Int {
