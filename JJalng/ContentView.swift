@@ -99,7 +99,6 @@ struct HomeView: View {
                 }
                 Spacer()
             }
-            .padding()
         }
     }
     func progressPercentage() -> CGFloat {
