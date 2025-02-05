@@ -9,12 +9,24 @@ import SwiftData
 import Foundation
 
 @Model
-final class MoneyStatus {
+class MoneyStatus {
+    var id: UUID  // ✅ 수동으로 UUID 추가
+    var memo: String
+    var category: String?
+    var date: Date
     var amount: Int
     var budget: Int
 
-    init(amount: Int = 0, budget: Int = 0) {
+    init(memo: String, category: String? = nil, date: Date, amount: Int, budget: Int) {
+        self.id = UUID()  // ✅ 고유한 ID 자동 생성
+        self.memo = memo
+        self.category = category
+        self.date = date
         self.amount = amount
         self.budget = budget
+    }
+
+    var remainingBudget: Int {
+        budget - amount
     }
 }
