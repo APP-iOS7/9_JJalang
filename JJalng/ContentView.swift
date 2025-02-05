@@ -9,37 +9,50 @@ import SwiftUI
 import SwiftData
 
 struct ContentView: View {
-    @State private var amount: Int = 0    // 현재 잔고
-    @State private var budget: Int = 0  // 목표 잔고 (저장됨)
-    @State private var tempBudget: String = ""
-  
+    @Query private var moneyStatusList: [MoneyStatus]
+    @Environment(\.modelContext) private var modelContext
+    
+    var moneyStatus: MoneyStatus {
+        moneyStatusList.first ?? MoneyStatus(amount: 0, budget: 0) // 기본값 설정
+    }
+    
     var body: some View {
-        TabView {
-            HomeView(amount: $amount, budget: $budget)
-                .tabItem {
-                    Label("홈", systemImage: "house.fill")
-                }
+        if let moneyStatus = moneyStatusList.first {
+            let bindableMoneyStatus = Binding(get: { moneyStatus.amount }, set: { moneyStatus.amount = $0 })
             
-            //            DetailView(amount: amount)
-            //                .tabItem {
-            //                    Label("상세 내역", systemImage: "list.bullet")
-            //                }
-            Calendar(amount: $amount)
-                .tabItem {
-                    Label("달력", systemImage: "calendar")
+            TabView {
+                HomeView(moneyStatus: moneyStatus)
+                    .tabItem {
+                        Label("홈", systemImage: "house.fill")
+                    }
+                Calendar(amount: bindableMoneyStatus)
+                    .tabItem {
+                        Label("달력", systemImage: "calendar")
+                    }
+            }
+        } else {
+            Text("데이터를 불러오는 중...")
+                .onAppear {
+                    addInitialMoneyStatus()
                 }
         }
+        
+    }
+    
+    private func addInitialMoneyStatus() {
+        let newMoneyStatus = MoneyStatus(amount: 0, budget: 0)
+        modelContext.insert(newMoneyStatus)
     }
 }
 
 struct HomeView: View {
-    @Binding var amount: Int
-    @Binding var budget: Int
+    @Environment(\.modelContext) private var modelContext
+    var moneyStatus: MoneyStatus
     @State private var tempBudget: String = ""
     
     var body: some View {
         VStack {
-            if budget == 0 {
+            if moneyStatus.budget == 0 {
                 // 예산 설정 화면
                 Text("예산을 설정하세요")
                     .font(.title)
@@ -52,7 +65,7 @@ struct HomeView: View {
                 
                 Button(action: {
                     if let value = Int(tempBudget), value > 0 {
-                        budget = value
+                        moneyStatus.budget = value
                     }
                 }) {
                     Text("설정 완료")
@@ -83,14 +96,14 @@ struct HomeView: View {
                         .stroke(AngularGradient(gradient: Gradient(colors: [.green, .yellow, .green]), center: .center), lineWidth: 20)
                         .rotationEffect(.degrees(-90))  // 12시부터 시작
                         .frame(width: 200, height: 200)
-                        .animation(.easeInOut(duration: 1), value: amount)
+                        .animation(.easeInOut(duration: 1), value: moneyStatus.amount)
                     
                     Spacer()
                     
                     VStack {
                         Text("이번 달 사용 금액")
                             .font(.headline)
-                        Text("₩ \(amount)")
+                        Text("₩ \(moneyStatus.amount)")
                             .font(.title)
                             .bold()
                             .padding(.top, 10)
@@ -98,15 +111,15 @@ struct HomeView: View {
                 }
                 .padding()
                 
-                Text("/ ₩ \(budget)")
+                Text("/ ₩ \(moneyStatus.budget)")
                     .foregroundColor(.gray)
                 
                 Spacer()
                 
                 // 지출/수입 추가 버튼
                 Button(action: {
-                    // 50000원씩 증가
-                    amount += 50000
+                    moneyStatus.amount += 50000
+                    try? modelContext.save() // 변경 사항 저장
                 }) {
                     Text("지출 추가")
                         .fontWeight(.bold)
@@ -122,29 +135,11 @@ struct HomeView: View {
     }
     
     func progressPercentage() -> CGFloat {
-        return CGFloat(min(Double(amount) / Double(budget), 1.0))
+        return CGFloat(min(Double(moneyStatus.amount) / Double(moneyStatus.budget), 1.0))
     }
 }
 
-//struct DetailView: View {
-//    var amount: Double
-//
-//    var body: some View {
-//        VStack {
-//            Text("상세 내역")
-//                .font(.largeTitle)
-//                .padding()
-//
-//            Text("이번 달 사용 금액: ₩ \(Int(amount))")
-//                .font(.title)
-//                .padding()
-//
-//            Spacer()
-//        }
-//    }
-//}
-
 #Preview {
     ContentView()
-        .modelContainer(for: Item.self, inMemory: true)
+        .modelContainer(for: [MoneyStatus.self, BuyHistory.self], inMemory: true)
 }
