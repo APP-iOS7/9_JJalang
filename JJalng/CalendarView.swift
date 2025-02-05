@@ -28,6 +28,7 @@ struct CalendarView: View {
                     .environment(\.locale, Locale(identifier: "ko"))
                 
                 List {
+                    Text(formatDate(selectedDate))
                     if filteredMoneyStatus.isEmpty {
                         Text("해당 날짜에 지출 내역이 없습니다.")
                             .foregroundColor(.gray)
