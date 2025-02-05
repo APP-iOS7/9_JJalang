@@ -1,8 +1,8 @@
 //
-//  ContentView.swift
+//  SwiftUIView.swift
 //  JJalng
 //
-//  Created by 장새벽 on 2/4/25
+//  Created by Saebyeok Jang on 2/4/25.
 //
 
 import SwiftUI
@@ -108,7 +108,8 @@ struct HomeView: View {
                 Spacer()
                 
                 Button(action: {
-                    moneyStatus.amount.append(50000)
+                    let newAmountInfo = AmountInfo(amount: 50000)
+                    moneyStatus.amount.append(newAmountInfo)
                     try? modelContext.save()
                 }) {
                     Text("지출 추가")

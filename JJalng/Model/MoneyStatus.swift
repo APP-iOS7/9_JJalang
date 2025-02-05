@@ -14,10 +14,10 @@ class MoneyStatus {
     var memo: String
     var category: String?
     var date: Date
-    var amount: [Int]
+    var amount: [AmountInfo]
     var budget: Int
 
-    init(memo: String, category: String? = nil, date: Date, amount: [Int] = [], budget: Int) {
+    init(memo: String, category: String? = nil, date: Date, amount: [AmountInfo] = [], budget: Int) {
         self.id = UUID()
         self.memo = memo
         self.category = category
@@ -27,10 +27,27 @@ class MoneyStatus {
     }
 
     var totalSpent: Int {
-            amount.reduce(0, +)
-        }
-        
-        var remainingBudget: Int {
-            budget - totalSpent
-        }
+        amount.reduce(0) { $0 + $1.amount }
+    }
+
+    var remainingBudget: Int {
+        budget - totalSpent
+    }
+}
+
+@Model  // ✅ SwiftData에서 관리 가능하도록 @Model 추가
+class AmountInfo: Identifiable {
+    var id: UUID
+    var amount: Int
+    var memo: String
+    var category: String?
+    var date: Date
+
+    init(amount: Int, memo: String = "", category: String? = nil, date: Date = Date()) {
+        self.id = UUID()
+        self.amount = amount
+        self.memo = memo
+        self.category = category
+        self.date = date
+    }
 }
