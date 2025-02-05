@@ -9,7 +9,7 @@ import SwiftUI
 
 // 슬롯 머신 메인 뷰 구조체
 struct SlotView: View {
-    private let items: [String]     // 표시할 아이템 배열
+    private let items: [String]     // 표시할 아이템 배열 
     
     init(items: [String]) {
         guard !items.isEmpty else {
