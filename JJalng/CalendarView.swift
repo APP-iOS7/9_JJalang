@@ -32,6 +32,7 @@ struct CalendarView: View {
                 
                 /// ✅ 선택한 날짜의 지출 내역 표시
                 List {
+                    Text(formatDate(selectedDate))
                     if filteredMoneyStatus.isEmpty {
                         Text("해당 날짜에 지출 내역이 없습니다.")
                             .foregroundColor(.gray)
