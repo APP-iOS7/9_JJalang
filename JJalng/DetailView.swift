@@ -10,36 +10,33 @@ import SwiftData
 
 struct DetailView: View {
     @Environment(\.modelContext) private var modelContext
-    @Bindable var buyHistory: BuyHistory  // ✅ SwiftData와 연동되는 바인딩
+    @Bindable var moneyStatus: MoneyStatus  // ✅ 바인딩 추가
 
     var body: some View {
         VStack {
-            Text("지출 내역")
+            Text("지출 상세 내역")
                 .font(.title)
                 .padding()
             
-            Text("₩ \(buyHistory.memo)") // ✅ 금액이 아니라 메모가 표시되는 부분 수정
+            Text("₩ \(moneyStatus.amount)")
                 .font(.largeTitle)
                 .bold()
                 .padding()
 
             // 폼 구성
             VStack(alignment: .leading, spacing: 20) {
-                TextField("메모", text: $buyHistory.memo)
+                TextField("메모", text: $moneyStatus.memo)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding()
 
                 TextField("카테고리", text: Binding(
-                    get: { buyHistory.category ?? "" },
-                    set: { buyHistory.category = $0.isEmpty ? nil : $0 }
+                    get: { moneyStatus.category ?? "" },
+                    set: { moneyStatus.category = $0.isEmpty ? nil : $0 }
                 ))
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding()
 
-                DatePicker("날짜", selection: Binding(
-                    get: { buyHistory.date ?? Date() },
-                    set: { buyHistory.date = $0 }
-                ), displayedComponents: [.date])
+                DatePicker("날짜", selection: $moneyStatus.date, displayedComponents: [.date])
                 .padding()
             }
             .padding()
@@ -75,12 +72,12 @@ struct DetailView: View {
     
     // 변경사항 저장
     private func saveChanges() {
-        try? modelContext.save() // ✅ SwiftData에 변경 사항 저장
+        try? modelContext.save()  // ✅ 변경 내용 저장
     }
     
     // 지출 내역 삭제
     private func deleteHistory() {
-        modelContext.delete(buyHistory) // ✅ SwiftData에서 삭제
+        modelContext.delete(moneyStatus)  // ✅ 데이터 삭제
         try? modelContext.save()
     }
 }
