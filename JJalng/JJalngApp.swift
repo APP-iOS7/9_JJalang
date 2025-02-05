@@ -10,7 +10,7 @@ import SwiftData
 
 @main
 struct JJalngApp: App {
-    private let modelContainer = try! ModelContainer(for: MoneyStatus.self)
+    private let modelContainer = try! ModelContainer(for: BuyHistory.self)
 
     var body: some Scene {
         WindowGroup {

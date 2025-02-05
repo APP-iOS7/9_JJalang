@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct BudgetSettingView: View {
     
@@ -33,6 +34,11 @@ struct BudgetSettingView: View {
             }
         }
     }
+    
+    @Environment(\.modelContext) private var modelContext
+    
+    @Query private var buyHistory: [BuyHistory]
+    @State private var selectedItem: BuyHistory? = nil
     
     @State private var budget: String = ""
     @State private var selectedDate: Int = 0
@@ -100,7 +106,8 @@ struct BudgetSettingView: View {
             Spacer()
             Button(action: {
                 selectedDate = selectedOption.days
-                
+                let filtered = budget.filter { $0.isNumber }
+                selectedItem?.budget = Int(filtered) ?? 0
                 // 예산 입력 검증: 비어있거나 숫자가 아닌 경우 처리
                 
                 guard !budget.isEmpty else {
