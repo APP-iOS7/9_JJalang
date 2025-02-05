@@ -25,7 +25,7 @@ struct Calendar: View {
                         Text("")
 
                         Text("총 지출 금액").font(.title2).foregroundStyle(.gray)
-                        Text("₩ \(Int(amount))").font(.largeTitle).fontWeight(.bold)
+                            Text("₩ \(amount)").font(.largeTitle).fontWeight(.bold)
                     }
                     
                 }
