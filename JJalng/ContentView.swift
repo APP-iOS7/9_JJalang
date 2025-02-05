@@ -112,6 +112,10 @@ struct HomeView: View {
                 }
                 Spacer()
             }
+//<<<<<<< HEAD
+//=======
+////            .padding()
+//>>>>>>> e41bd66 (로컬 변경 사항 저장)
         }
     }
     
