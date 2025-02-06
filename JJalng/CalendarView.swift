@@ -38,7 +38,7 @@ struct ExpenseRow: View {
     var body: some View {
         HStack {
             HStack{
-                Text(category)
+                Text(category == "" ? "📂 기타" : category)
                     .foregroundStyle(.gray)
                     .font(.caption)
                 Text(" ₩ \(amount)")
