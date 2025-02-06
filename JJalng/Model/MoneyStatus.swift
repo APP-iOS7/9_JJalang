@@ -17,6 +17,8 @@ class MoneyStatus {
     var amount: [AmountInfo]
     var budget: Int
     var targetTime: Int // 예산 목표 기간 (BudgetSettingView 의 enum 연관값)
+}
+
 
     init(memo: String,
          category: String? = nil,
@@ -49,17 +51,30 @@ class MoneyStatus {
 }
 
 @Model
-class AmountInfo: Identifiable {
-    var id: String = UUID().uuidString
+final class AmountInfo {
     var amount: Int
-    var memo: String
-    var category: String?
+    var category: String
     var date: Date
-
-    init(amount: Int, memo: String = "", category: String? = nil, date: Date = Date()) {
+    
+    init(amount: Int, category: String, date: Date) {
         self.amount = amount
-        self.memo = memo
         self.category = category
         self.date = date
     }
 }
+
+//@Model
+//class AmountInfo: Identifiable {
+//    var id: String = UUID().uuidString
+//    var amount: Int
+//    var memo: String
+//    var category: String?
+//    var date: Date
+//
+//    init(amount: Int, memo: String = "", category: String? = nil, date: Date = Date()) {
+//        self.amount = amount
+//        self.memo = memo
+//        self.category = category
+//        self.date = date
+//    }
+//}
