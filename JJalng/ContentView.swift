@@ -131,7 +131,6 @@ struct HomeView: View {
             }
         }
     }
-    let filteredSpent = moneyStatus.filteredAmount.reduce(0) { $0 + $1.amount }
 
     func progressPercentage() -> CGFloat {
       // 특정 기간 내의 지출만 합산하여 반영
@@ -165,10 +164,8 @@ struct HomeView: View {
             
         }
     }
-    #Preview {
-        ContentView()
-            .modelContainer(for: [MoneyStatus.self], inMemory: true)
-    }
-        
-
+}
+#Preview {
+    ContentView()
+        .modelContainer(for: [MoneyStatus.self], inMemory: true)
 }
