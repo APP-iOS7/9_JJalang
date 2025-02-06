@@ -103,12 +103,11 @@ struct DetailView: View {
                 targetContainer.amount.append(selectedAmount)
             } else {
                 // 없으면 새 컨테이너 생성
-                let newContainer = MoneyStatus(
+                let newContainer = AmountInfo(
+                    amount: 0,
                     memo: "",
-                    date: newTransactionDate,
-                    amount: [selectedAmount],
-                    budget: moneyStatus.budget,
-                    targetTime: moneyStatus.targetTime
+                    category: "",
+                    date: newTransactionDate
                 )
                 modelContext.insert(newContainer)
             }
