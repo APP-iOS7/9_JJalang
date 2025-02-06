@@ -15,7 +15,6 @@ struct DetailView: View {
     var selectedAmount: AmountInfo
     @State private var amount: Int
     @State private var memo: String
-    @State private var category: String?
     @State private var date: Date
     @State private var showDatePickerSheet: Bool = false
     
@@ -23,7 +22,6 @@ struct DetailView: View {
         self.selectedAmount = selectedAmount
         _amount = State(initialValue: selectedAmount.amount)
         _memo = State(initialValue: selectedAmount.memo)
-        _category = State(initialValue: selectedAmount.category)
         _date = State(initialValue: selectedAmount.date)
     }
     
@@ -45,13 +43,11 @@ struct DetailView: View {
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding()
                 
-                // CategoryPickerView 사용
                 CategoryPickerView(categories: categories,
                                    selectedCategory: Binding(
                                     get: { selectedAmount.category ?? "" },
                                     set: { selectedAmount.category = $0 }
                                    ))
-                
                 .padding()
                 
                 HStack {
@@ -107,11 +103,6 @@ struct DetailView: View {
                     .datePickerStyle(.graphical)
                     .padding()
                     .environment(\.locale, Locale(identifier: "ko"))
-                
-                    .onChange(of: selectedAmount.date) { newValue, transaction in
-                        
-                        showDatePickerSheet = false
-                    }
                     .tint(.green)
                 
                 Button("닫기") {
@@ -139,7 +130,6 @@ struct DetailView: View {
     private func saveChanges() {
         selectedAmount.amount = amount
         selectedAmount.memo = memo
-        selectedAmount.category = category
         selectedAmount.date = date
         
         do {
