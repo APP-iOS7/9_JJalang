@@ -55,6 +55,12 @@ class MoneyStatus {
         return MoneyStatus.dateFormatter.string(from: periodTime)
     }
     
+    // 예산에서 filteredAmount 지출을 뺀 잔액 계산
+    var remainingBudget: Int {
+        let totalFilteredSpent = filteredAmount.reduce(0) { $0 + $1.amount }
+        return budget - totalFilteredSpent
+    }
+    
     private static let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "ko_KR")  // 한국 로케일
