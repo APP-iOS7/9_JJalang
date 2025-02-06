@@ -57,7 +57,7 @@ struct ExpenseSection: View {
         Section {
             ForEach(money.amount) { amount in
                 NavigationLink {
-                    DetailView(selectedAmount: binding(for: amount))
+                    DetailView(selectedAmount: amount)
                 } label: {
                     ExpenseRow(memo: amount.memo, amount: amount.amount)
                 }

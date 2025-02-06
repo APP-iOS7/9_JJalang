@@ -28,8 +28,13 @@ struct SlotView: View {
         VStack(spacing: 20) {
             //제목
             Text("오늘의 랜덤 메뉴는?")
-                .font(.system(size: 40, weight: .bold, design: .rounded))
-                .foregroundColor(Color(red: 0.3, green: 0.9, blue: 0.8))
+                .font(.system(size: 40, weight: .bold))
+                .foregroundColor(Color(.black))
+                .background(Rectangle()
+                    .fill(Color.green.opacity(0.3))
+                    .frame(height: 10)
+                    .offset(y: 20)
+                )
             
             // 선택된 아이템 표시
             if let selected = selectedItem {
@@ -39,7 +44,7 @@ struct SlotView: View {
             } else {
                 Text(" ")
                     .font(.headline)
-                    .padding()
+//                    .padding()
             }
             reelsView
             spinButton
@@ -69,8 +74,10 @@ struct SlotView: View {
                 .foregroundColor(.white)
                 .padding()
                 .frame(maxWidth: 200)
-                .background(isSpinning ? .gray : Color(red: 0.2, green: 0.9, blue: 0.8))
                 .cornerRadius(10)
+                .background( RoundedRectangle(cornerRadius: 20)
+                    .fill(LinearGradient(gradient: Gradient(colors: [ Color.green.opacity(0.3), Color.green.opacity(0.7),Color.green.opacity(0.3)]), startPoint: .topLeading, endPoint: .bottomTrailing))
+                )
         }
         // 스핀 중 버튼 비활성화
         .disabled(isSpinning)
@@ -130,16 +137,21 @@ struct PickerReel: View {
                 Text(items[i % items.count])
                     .font(.system(size: 24, weight: .semibold))
                     .frame(width: 200, height: itemHeight)
-            }
+                    .background(Color(hue: Double(i % items.count) / Double(items.count), saturation: 0.3, brightness: 0.95))
+                    .cornerRadius(15)
+                    .shadow(color: .gray.opacity(0.2), radius: 5, x: 0, y: 2)
+                    .overlay(RoundedRectangle(cornerRadius: 15)
+                        .stroke(Color.white, lineWidth: 2))
+            } // 배경색 바꾸기
         }
         // .offset(x:y:)는 뷰를 지정한 x, y 좌표만큼 이동시키지만, 레이아웃에는 영향을 주지 않습니다.
         .offset(y: offset)
         .frame(height: itemHeight)
         .clipped()  // 넘어가는 부분 잘라줌.
         .background(
-            Color.gray
-                .opacity(0.2)
-                .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.5), lineWidth: 2))
+            RoundedRectangle(cornerRadius: 20)
+                .fill(Color.white)
+                .shadow(color: .gray.opacity(0.3), radius: 10, x: 0, y: 5)
         )
     }
 }

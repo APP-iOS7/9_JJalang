@@ -1,5 +1,5 @@
 //
-//  SwiftUIView.swift
+//  DetailView.swift
 //  JJalng
 //
 //  Created by Saebyeok Jang on 2/4/25.
@@ -18,8 +18,14 @@ import SwiftData
 struct DetailView: View {
     @Environment(\.presentationMode) private var presentationMode
     @Environment(\.modelContext) private var modelContext
-    @Binding var selectedAmount: AmountInfo
+    
+    var selectedAmount: AmountInfo  // @Binding 제거
+    @State private var amount: Int
+    @State private var memo: String
+    @State private var category: String?
+    @State private var date: Date
     @State private var showDatePickerSheet: Bool = false
+
     private let categories = ["🍽️ 식비", "🚗 교통", "🛍 쇼핑", "🎮 여가", "💰 저축", "📂 기타"]
     
     var body: some View {
@@ -28,26 +34,27 @@ struct DetailView: View {
                 .font(.title)
                 .padding()
             
-            Text("선택된 금액: ₩ \(selectedAmount.amount)")
+            Text("선택된 금액: ₩ \(amount)")
                 .font(.title2)
                 .bold()
                 .padding()
             
             VStack(alignment: .leading, spacing: 20) {
-                TextField("메모", text: $selectedAmount.memo)
+                TextField("메모", text: $memo)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding()
-                
+
                 // CategoryPickerView 사용
                 CategoryPickerView(categories: categories,
                                    selectedCategory: Binding(
                                     get: { selectedAmount.category ?? "" },
                                     set: { selectedAmount.category = $0 }
                                    ))
+
                 .padding()
                 
                 HStack {
-                    Text(dateFormatter(date: selectedAmount.date))
+                    Text(dateFormatter(date: date))
                     Spacer()
                     Button(action: {
                         showDatePickerSheet = true
@@ -95,11 +102,13 @@ struct DetailView: View {
         // 날짜 선택 sheet
         .sheet(isPresented: $showDatePickerSheet) {
             VStack {
-                DatePicker("날짜 선택", selection: $selectedAmount.date, displayedComponents: [.date])
+                DatePicker("날짜 선택", selection: $date, displayedComponents: [.date])
                     .datePickerStyle(.graphical)
                     .padding()
                     .environment(\.locale, Locale(identifier: "ko"))
+
                     .onChange(of: selectedAmount.date) { newValue, transaction in
+
                         showDatePickerSheet = false
                     }
                     .tint(.green)
@@ -127,6 +136,11 @@ struct DetailView: View {
     }
     
     private func saveChanges() {
+        selectedAmount.amount = amount
+        selectedAmount.memo = memo
+        selectedAmount.category = category
+        selectedAmount.date = date
+        
         do {
             try modelContext.save()
         } catch {
