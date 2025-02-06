@@ -15,7 +15,7 @@ struct AddTransactionView: View {
     @State private var selectedCategory: String = ""
     @State private var navigateToMemoInput: Bool = false
     @Binding var selectedTab: Int
-    
+
     let categories = [
         "🍽️ 식비",
         "🚗 교통",
@@ -25,16 +25,18 @@ struct AddTransactionView: View {
         "📂 기타"
     ]
     
-    private var amount: Int? {
-        let clean = amountString.filter { $0.isNumber }
-        return Int(clean)
-    }
-    
+    // NumberFormatter를 재사용하도록 computed property로 생성
     private var numberFormatter: NumberFormatter {
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
         formatter.maximumFractionDigits = 0
         return formatter
+    }
+    
+    // amountString에서 숫자만 추출하여 Int로 변환
+    private var amount: Int? {
+        let clean = amountString.filter { $0.isNumber }
+        return Int(clean)
     }
     
     var body: some View {
@@ -49,9 +51,8 @@ struct AddTransactionView: View {
                     
                     CategoryPickerView(categories: categories,
                                        selectedCategory: $selectedCategory)
-                    .padding()
+                        .padding()
                     
-                    // 금액 입력 박스
                     VStack(alignment: .leading) {
                         Text("금액")
                             .font(.subheadline)
@@ -64,21 +65,24 @@ struct AddTransactionView: View {
                                 RoundedRectangle(cornerRadius: 10)
                                     .fill(Color(.systemGray6))
                             )
-                            .onChange(of: amountString) { newValue, _ in
+                            .onChange(of: amountString) { newValue in
+                                // 입력된 문자열에서 숫자만 남깁니다.
                                 let filtered = newValue.filter { $0.isNumber }
-                                guard let number = Int(filtered) else {
-                                    amountString = ""
-                                    return
-                                }
-                                if let formatted = numberFormatter.string(from: NSNumber(value: number)) {
+                                
+                                // Int로 변환 가능하면 formatter를 적용한 문자열로 변경
+                                if let number = Int(filtered),
+                                   let formatted = numberFormatter.string(from: NSNumber(value: number)) {
+                                    // formatted 값이 현재 입력과 다르면 업데이트
                                     if formatted != newValue {
                                         amountString = formatted
                                     }
+                                } else {
+                                    // 숫자로 변환 불가능하면 빈 문자열로 처리
+                                    amountString = ""
                                 }
                             }
                     }
                     
-                    // 날짜 선택 박스
                     VStack(alignment: .leading) {
                         Text("날짜")
                             .font(.subheadline)
@@ -96,7 +100,6 @@ struct AddTransactionView: View {
                         .frame(height: 50)
                     }
                     
-                    // 추가 버튼
                     Button(action: {
                         if amount != nil {
                             navigateToMemoInput = true
@@ -127,5 +130,5 @@ struct AddTransactionView: View {
 #Preview {
     AddTransactionView(moneyStatus: MoneyStatus(date: Date(), amount: [], budget: 0, targetTime: 1),
                        selectedTab: .constant(0))
-    .modelContainer(for: MoneyStatus.self, inMemory: true)
+        .modelContainer(for: MoneyStatus.self, inMemory: true)
 }
