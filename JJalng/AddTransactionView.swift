@@ -12,8 +12,7 @@ struct AddTransactionView: View {
     @Bindable var moneyStatus: MoneyStatus
     @State private var amountString: String = ""
     @State private var selectedDate: Date = Date()
-    @State private var selectedCategory: String = "🍽️ 식비"
-    @State private var isCategoryExpanded: Bool = false
+    @State private var selectedCategory: String = ""
     @State private var navigateToMemoInput: Bool = false
     @Binding var selectedTab: Int
     
@@ -25,12 +24,12 @@ struct AddTransactionView: View {
         "💰 저축",
         "📂 기타"
     ]
-
+    
     private var amount: Int? {
         let clean = amountString.filter { $0.isNumber }
         return Int(clean)
     }
-
+    
     private var numberFormatter: NumberFormatter {
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
@@ -47,53 +46,10 @@ struct AddTransactionView: View {
                         .fontWeight(.bold)
                         .foregroundColor(.black)
                         .padding(.top, 20)
-                    VStack(alignment: .leading) {
-                        Text("지출 항목")
-                            .font(.subheadline)
-                            .foregroundColor(.gray)
-                        
-                        Button(action: {
-                            isCategoryExpanded.toggle()
-                        }) {
-                            HStack {
-                                Text(selectedCategory)
-                                    .font(.headline)
-                                    .foregroundColor(.black)
-                                Spacer()
-                                Image(systemName: isCategoryExpanded ? "chevron.up" : "chevron.down")
-                                    .foregroundColor(.gray)
-                            }
-                            .padding()
-                            .background(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .fill(Color(.systemGray6))
-                            )
-                        }
-                        
-                        if isCategoryExpanded {
-                            VStack(spacing: 10) {
-                                ForEach(categories, id: \.self) { category in
-                                    Button(action: {
-                                        selectedCategory = category
-                                        isCategoryExpanded = false
-                                    }) {
-                                        HStack {
-                                            Text(category)
-                                                .foregroundColor(.black)
-                                            Spacer()
-                                            if selectedCategory == category {
-                                                Image(systemName: "checkmark")
-                                                    .foregroundColor(.blue)
-                                            }
-                                        }
-                                        .padding()
-                                        .background(RoundedRectangle(cornerRadius: 10).fill(Color(.systemGray5)))
-                                    }
-                                }
-                            }
-                            .padding(.top, 5)
-                        }
-                    }
+                    
+                    CategoryPickerView(categories: categories,
+                                       selectedCategory: $selectedCategory)
+                    .padding()
                     
                     // 금액 입력 박스
                     VStack(alignment: .leading) {
@@ -108,7 +64,7 @@ struct AddTransactionView: View {
                                 RoundedRectangle(cornerRadius: 10)
                                     .fill(Color(.systemGray6))
                             )
-                            .onChange(of: amountString) { newValue in
+                            .onChange(of: amountString) { newValue, _ in
                                 let filtered = newValue.filter { $0.isNumber }
                                 guard let number = Int(filtered) else {
                                     amountString = ""
@@ -121,7 +77,6 @@ struct AddTransactionView: View {
                                 }
                             }
                     }
-                 
                     
                     // 날짜 선택 박스
                     VStack(alignment: .leading) {
@@ -168,8 +123,9 @@ struct AddTransactionView: View {
         }
     }
 }
+
 #Preview {
     AddTransactionView(moneyStatus: MoneyStatus(date: Date(), amount: [], budget: 0, targetTime: 1),
                        selectedTab: .constant(0))
-        .modelContainer(for: MoneyStatus.self, inMemory: true)
+    .modelContainer(for: MoneyStatus.self, inMemory: true)
 }
