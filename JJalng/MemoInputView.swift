@@ -18,6 +18,8 @@ struct MemoInputView: View {
     @Binding var selectedTab: Int
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
+    
+    var dismissAction: () -> Void
 
     var body: some View {
         VStack {
@@ -72,10 +74,11 @@ struct MemoInputView: View {
         // 홈 탭으로 전환 후 뷰 종료
         selectedTab = 0
         dismiss()
+        dismissAction()
     }
 }
 
 #Preview {
-    MemoInputView(amount: 10000, category: "🍽️ 식비", date: Date(), selectedTab: .constant(0))
+    MemoInputView(amount: 10000, category: "🍽️ 식비", date: Date(), selectedTab: .constant(0), dismissAction: {})
 }
 
