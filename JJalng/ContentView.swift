@@ -6,7 +6,6 @@ struct ContentView: View {
     @Query private var moneyStatusList: [MoneyStatus]
     @Environment(\.modelContext) private var modelContext
     @State private var selectedTab = 0
-    
     var moneyStatus: MoneyStatus? {
         moneyStatusList.first
     }
@@ -132,36 +131,42 @@ struct HomeView: View {
         }
     }
 
+
     func progressPercentage() -> CGFloat {
       // 특정 기간 내의 지출만 합산하여 반영
       let filteredSpent = moneyStatus.filteredAmount.reduce(0) { $0 + $1.amount }
-
+        print(Double(filteredSpent) / Double(moneyStatus.budget))
       return CGFloat(filteredSpent) / CGFloat(moneyStatus.budget)
     }
    // guard moneyStatus.budget > 0 else { return 0 }
     private var budgetMessage: String {
-        let percentage = Double(moneyStatus.totalSpent) / Double(moneyStatus.budget)
-        if percentage == 0 {
-            return ""
-        } else if percentage < 0.5 {
-            return "예산의 절반 이하를 사용했어요"
-        } else if percentage < 0.8 {
+        let filteredSpent = moneyStatus.filteredAmount.reduce(0) { $0 + $1.amount }
+        let percentage = Double(filteredSpent) / Double(moneyStatus.budget)
+        switch percentage {
+        case let x where x > 1.0:
+            return "예산을 초과했어요."
+        case let x where x == 1.0:
+            return "예산을 모두 사용했어요."
+        case let x where x >= 0.8:
+            return "예산의 80% 이상을 사용했어요."
+        case let x where x >= 0.5:
             return "예산의 절반 이상을 사용했어요"
-        } else if percentage < 1.0 {
-            return "예산의 80% 이상을 사용했어요"
-        } else {
-            return "예산을 초과했어요"
+        default:
+            return " "
         }
-    }
+
+        }
+    
     private var budgetMessageColor: Color {
-        let percentage = Double(moneyStatus.totalSpent) / Double(moneyStatus.budget)
-        if percentage < 0.5 {
+        let filteredSpent = moneyStatus.filteredAmount.reduce(0) { $0 + $1.amount }
+        let percentage = Double(filteredSpent) / Double(moneyStatus.budget)
+        switch percentage {
+        case let x where x < 0.5:
             return .green
-        } else if percentage < 0.8 {
+        case let x where x < 0.8:
             return .orange
-        } else {
+        default:
             return .red
-            
         }
     }
 }

@@ -1,5 +1,5 @@
 //
-//  SwiftUIView.swift
+//  DetailView.swift
 //  JJalng
 //
 //  Created by Saebyeok Jang on 2/4/25.
@@ -11,8 +11,21 @@ import SwiftData
 struct DetailView: View {
     @Environment(\.presentationMode) private var presentationMode
     @Environment(\.modelContext) private var modelContext
-    @Binding var selectedAmount: AmountInfo
+    
+    var selectedAmount: AmountInfo  // @Binding 제거
+    @State private var amount: Int
+    @State private var memo: String
+    @State private var category: String?
+    @State private var date: Date
     @State private var showDatePickerSheet: Bool = false
+
+    init(selectedAmount: AmountInfo) {
+        self.selectedAmount = selectedAmount
+        _amount = State(initialValue: selectedAmount.amount)
+        _memo = State(initialValue: selectedAmount.memo)
+        _category = State(initialValue: selectedAmount.category)
+        _date = State(initialValue: selectedAmount.date)
+    }
 
     var body: some View {
         VStack {
@@ -20,25 +33,25 @@ struct DetailView: View {
                 .font(.title)
                 .padding()
             
-            Text("선택된 금액: ₩ \(selectedAmount.amount)")
+            Text("선택된 금액: ₩ \(amount)")
                 .font(.title2)
                 .bold()
                 .padding()
             
             VStack(alignment: .leading, spacing: 20) {
-                TextField("메모", text: $selectedAmount.memo)
+                TextField("메모", text: $memo)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding()
                 
                 TextField("카테고리", text: Binding(
-                    get: { selectedAmount.category ?? "" },
-                    set: { selectedAmount.category = $0.isEmpty ? nil : $0 }
+                    get: { category ?? "" },
+                    set: { category = $0.isEmpty ? nil : $0 }
                 ))
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding()
                 
                 HStack {
-                    Text(dateFormatter(date: selectedAmount.date))
+                    Text(dateFormatter(date: date))
                     Spacer()
                     Button(action: {
                         showDatePickerSheet = true
@@ -85,11 +98,11 @@ struct DetailView: View {
         .navigationBarTitle("지출 상세", displayMode: .inline)
         .sheet(isPresented: $showDatePickerSheet) {
             VStack {
-                DatePicker("날짜 선택", selection: $selectedAmount.date, displayedComponents: [.date])
+                DatePicker("날짜 선택", selection: $date, displayedComponents: [.date])
                     .datePickerStyle(.graphical)
                     .padding()
                     .environment(\.locale, Locale(identifier: "ko"))
-                    .onChange(of: selectedAmount.date) {
+                    .onChange(of: date) {
                         showDatePickerSheet = false
                     }
                     .tint(.green)
@@ -104,21 +117,26 @@ struct DetailView: View {
     
     private func dateFormatter(date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "ko_KR")  // 한국 로케일
-        formatter.timeZone = TimeZone(identifier: "Asia/Seoul") // 한국 시간 (KST)
+        formatter.locale = Locale(identifier: "ko_KR")
+        formatter.timeZone = TimeZone(identifier: "Asia/Seoul")
         formatter.dateFormat = "yyyy년 MM월 dd일"
         return formatter.string(from: date)
     }
 
     private func deleteSelectedAmount() {
-        modelContext.delete(selectedAmount)  // 개별 AmountInfo 삭제
-        try? modelContext.save()  // 변경사항 저장
+        modelContext.delete(selectedAmount)
+        try? modelContext.save()
         presentationMode.wrappedValue.dismiss()
     }
     
     private func saveChanges() {
+        selectedAmount.amount = amount
+        selectedAmount.memo = memo
+        selectedAmount.category = category
+        selectedAmount.date = date
+        
         do {
-            try modelContext.save()  // AmountInfo 수정 후 저장
+            try modelContext.save()
         } catch {
             print("저장 실패: \(error)")
         }
