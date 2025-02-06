@@ -69,6 +69,7 @@ struct HomeView: View {
                         Image(systemName: "gearshape.fill")
                             .foregroundStyle(.green)
                     }
+                    .padding(.trailing, 16)
                 }
                 Image("JJalang")
                     .resizable()
