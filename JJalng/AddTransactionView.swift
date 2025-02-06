@@ -10,11 +10,11 @@ import SwiftUI
 struct AddTransactionView: View {
     @Environment(\.modelContext) private var modelContext
     @Bindable var moneyStatus: MoneyStatus
-    @State private var amount: String = ""
+    @State private var amountString: String = ""
     @State private var selectedDate: Date = Date()
     @State private var selectedCategory: String = "🍽️ 식비"
     @State private var isCategoryExpanded: Bool = false
-    @State private var navigateToMemoInput:Bool = false
+    @State private var navigateToMemoInput: Bool = false
     @Binding var selectedTab: Int
     
     let categories = [
@@ -25,19 +25,28 @@ struct AddTransactionView: View {
         "💰 저축",
         "📂 기타"
     ]
+
+    private var amount: Int? {
+        let clean = amountString.filter { $0.isNumber }
+        return Int(clean)
+    }
+
+    private var numberFormatter: NumberFormatter {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.maximumFractionDigits = 0
+        return formatter
+    }
     
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 20) {
-                    // 상단 제목
                     Text("지출 추가")
                         .font(.largeTitle)
                         .fontWeight(.bold)
                         .foregroundColor(.black)
                         .padding(.top, 20)
-                    
-                    // 지출 항목 선택
                     VStack(alignment: .leading) {
                         Text("지출 항목")
                             .font(.subheadline)
@@ -92,13 +101,25 @@ struct AddTransactionView: View {
                             .font(.subheadline)
                             .foregroundColor(.gray)
                         
-                        TextField("원", text: $amount)
+                        TextField("원", text: $amountString)
                             .keyboardType(.numberPad)
                             .padding()
                             .background(
                                 RoundedRectangle(cornerRadius: 10)
                                     .fill(Color(.systemGray6))
                             )
+                            .onChange(of: amountString) { newValue in
+                                let filtered = newValue.filter { $0.isNumber }
+                                guard let number = Int(filtered) else {
+                                    amountString = ""
+                                    return
+                                }
+                                if let formatted = numberFormatter.string(from: NSNumber(value: number)) {
+                                    if formatted != newValue {
+                                        amountString = formatted
+                                    }
+                                }
+                            }
                     }
                     
                     // 날짜 선택 박스
@@ -121,9 +142,8 @@ struct AddTransactionView: View {
                     
                     // 추가 버튼
                     Button(action: {
-                        if Int(amount) != nil {
-                            //                            addTransaction(amount: amountValue)
-                            navigateToMemoInput = true //
+                        if amount != nil {
+                            navigateToMemoInput = true
                         }
                     }) {
                         Text("다음")
@@ -133,44 +153,23 @@ struct AddTransactionView: View {
                             .background(Color.green)
                             .foregroundColor(.white)
                             .cornerRadius(10)
-                        //                        .shadow(color: .yellow.opacity(0.3), radius: 5, x: 0, y: 3)
                     }
                     .padding(.bottom, 20)
                 }
                 .padding()
             }
-            //            private func addTransaction(amount: Int) {
-            //                if let moneyStatus = moneyStatusList.first {
-            //                    let newAmountInfo = AmountInfo(amount: amount, category: selectedCategory, date: selectedDate)
-            //
-            //                    moneyStatus.amount.append(newAmountInfo)
-            //                    try? modelContext.save()
-            //                }
-            //            }
             .navigationDestination(isPresented: $navigateToMemoInput) {
-                MemoInputView(amount: amount, category: selectedCategory, date: selectedDate, selectedTab: $selectedTab)
+                MemoInputView(amount: amount ?? 0,
+                              category: selectedCategory,
+                              date: selectedDate,
+                              selectedTab: $selectedTab)
             }
         }
     }
 }
-    
-//    private func saveTransaction() {
-//        guard let amountValue = Int(amount) else { return }
-//        let newAmount = AmountInfo(amount: amountValue, memo: memo, category: category, date: date)
-//    }
-    
-    
-    
-//    private func addTransaction(amount: Int) {
-//        let newAmountInfo = AmountInfo(amount: amount, category: selectedCategory, date: selectedDate)
-//        
-//        moneyStatus.amount.append(newAmountInfo)
-//        try? modelContext.save()
-//    }
 
-    
 #Preview {
-    AddTransactionView(moneyStatus: MoneyStatus(date: Date(), amount: [], budget: 0, targetTime: 1), selectedTab: .constant(0))
+    AddTransactionView(moneyStatus: MoneyStatus(date: Date(), amount: [], budget: 0, targetTime: 1),
+                       selectedTab: .constant(0))
         .modelContainer(for: MoneyStatus.self, inMemory: true)
 }
-
