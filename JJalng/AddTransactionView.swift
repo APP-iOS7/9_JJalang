@@ -161,9 +161,9 @@ struct AddTransactionView: View {
 }
     
 
-#Preview {
-    AddTransactionView(moneyStatus: MoneyStatus(backingData: <#any BackingData<MoneyStatus>#>),
+//#Preview {
+//    AddTransactionView(moneyStatus: MoneyStatus(backingData: <#any BackingData<MoneyStatus>#>),
                        
-                       selectedTab: .constant(0))
-    .modelContainer(for: MoneyStatus.self)
-}
+//                       selectedTab: .constant(0))
+//    .modelContainer(for: MoneyStatus.self)
+//}
