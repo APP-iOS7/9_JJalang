@@ -13,6 +13,7 @@ struct DetailView: View {
     @Environment(\.modelContext) private var modelContext
     @Binding var moneyStatus: MoneyStatus
     @Binding var selectedAmount: AmountInfo
+    @State private var showDatePickerSheet: Bool = false
 
     var body: some View {
         VStack {
@@ -20,31 +21,43 @@ struct DetailView: View {
                 .font(.title)
                 .padding()
             
-            // 선택된 Amount 정보 표시
             Text("선택된 금액: ₩ \(selectedAmount.amount)")
                 .font(.title2)
                 .bold()
                 .padding()
-
+            
             VStack(alignment: .leading, spacing: 20) {
-                // 메모 수정
                 TextField("메모", text: $selectedAmount.memo)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding()
-
-                // 카테고리 수정
+                
                 TextField("카테고리", text: Binding(
                     get: { selectedAmount.category ?? "" },
                     set: { selectedAmount.category = $0.isEmpty ? nil : $0 }
                 ))
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding()
-
-                // 날짜 수정
-                DatePicker("날짜", selection: $selectedAmount.date, displayedComponents: [.date])
-                    .padding()
+                
+                HStack {
+                    Spacer()
+                    Button(action: {
+                        showDatePickerSheet = true
+                    }) {
+                        Text("날짜 변경")
+                            .fontWeight(.bold)
+                            .padding(.vertical, 8)
+                            .padding(.horizontal, 16)
+                            .background(Color.white)
+                            .cornerRadius(8)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(Color.gray, lineWidth: 1)
+                            )
+                    }
+                }
+                .padding(.horizontal)
             }
-
+            
             HStack {
                 Button(action: saveChanges) {
                     Text("저장")
@@ -55,7 +68,7 @@ struct DetailView: View {
                         .foregroundColor(.white)
                         .cornerRadius(10)
                 }
-
+                
                 Button(action: deleteSelectedAmount) {
                     Text("삭제")
                         .font(.title2)
@@ -70,6 +83,30 @@ struct DetailView: View {
         }
         .padding()
         .navigationBarTitle("지출 상세", displayMode: .inline)
+        .sheet(isPresented: $showDatePickerSheet) {
+            VStack {
+                DatePicker("날짜 선택", selection: $selectedAmount.date, displayedComponents: [.date])
+                    .datePickerStyle(.graphical)
+                    .padding()
+                    .environment(\.locale, Locale(identifier: "ko"))
+                    .onChange(of: selectedAmount.date) { _ in
+                        showDatePickerSheet = false
+                    }
+                
+                Button("닫기") {
+                    showDatePickerSheet = false
+                }
+                .padding()
+            }
+        }
+    }
+    
+    private func formattedDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "ko_KR")
+        formatter.timeZone = TimeZone(identifier: "Asia/Seoul")
+        formatter.dateFormat = "yyyy년 MM월 dd일"
+        return formatter.string(from: date)
     }
     
     private func deleteSelectedAmount() {
@@ -81,38 +118,34 @@ struct DetailView: View {
     }
     
     private func saveChanges() {
-        // 선택한 거래의 날짜를 하루 단위로 맞춥니다.
         let newTransactionDate = Calendar.current.startOfDay(for: selectedAmount.date)
         let currentContainerDate = Calendar.current.startOfDay(for: moneyStatus.date)
-
-        // 거래 날짜가 컨테이너 날짜와 다르면 이동 로직 실행
+        
         if newTransactionDate != currentContainerDate {
-            // 1. 현재 컨테이너에서 해당 거래 제거
-            if let index = moneyStatus.amount.firstIndex(where: { $0.id == selectedAmount.id }) {
+            let transactionToMove = selectedAmount
+            
+            if let index = moneyStatus.amount.firstIndex(where: { $0.id == transactionToMove.id }) {
                 moneyStatus.amount.remove(at: index)
             }
             
-            // 2. 새로운 날짜에 해당하는 MoneyStatus 컨테이너 검색 (SwiftData 전용 Predicate 사용)
-            let predicate: Predicate<MoneyStatus>? = #Predicate { money in
-                money.date == newTransactionDate
+            let nextDay = Calendar.current.date(byAdding: .day, value: 1, to: newTransactionDate)!
+            let predicate: Predicate<MoneyStatus> = #Predicate { money in
+                money.date >= newTransactionDate && money.date < nextDay
             }
             let fetchDescriptor = FetchDescriptor<MoneyStatus>(predicate: predicate)
             
             if let targetContainer = try? modelContext.fetch(fetchDescriptor).first {
-                // 해당 날짜의 컨테이너가 있으면 거래 추가
-                targetContainer.amount.append(selectedAmount)
+                targetContainer.amount.append(transactionToMove)
             } else {
-                // 없으면 새 컨테이너 생성
-                let newContainer = AmountInfo(
-                    amount: 0,
-                    memo: "",
-                    category: "",
-                    date: newTransactionDate
+                let newContainer = MoneyStatus(
+                    date: newTransactionDate,
+                    amount: [transactionToMove],
+                    budget: moneyStatus.budget,
+                    targetTime: moneyStatus.targetTime
                 )
                 modelContext.insert(newContainer)
             }
             
-            // 현재 컨테이너에 거래가 남아있지 않으면 삭제 (선택 사항)
             if moneyStatus.amount.isEmpty {
                 modelContext.delete(moneyStatus)
             }
@@ -123,6 +156,7 @@ struct DetailView: View {
         } catch {
             print("저장 실패: \(error)")
         }
+        
         presentationMode.wrappedValue.dismiss()
     }
 }

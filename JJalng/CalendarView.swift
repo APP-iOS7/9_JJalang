@@ -63,7 +63,6 @@ struct ExpenseSection: View {
                     )
                 } label: {
                     ExpenseRow(memo: money.amount[index].memo, amount: amount.amount)
-
                 }
             }
         }
@@ -138,9 +137,10 @@ struct CalendarView: View {
         moneyStatusList.flatMap { $0.amount }.reduce(0) { $0 + $1.amount }
     }
     
+    // 기존 코드는 매 MoneyStatus 요소에 대해 상수 값을 반환했으므로 수정합니다.
     var filteredMoneyStatus: [MoneyStatus] {
-        moneyStatusList.filter { _ in
-            Calendar.current.isDate(Date(), inSameDayAs: selectedDate)
+        moneyStatusList.filter { money in
+            Calendar.current.isDate(money.date, inSameDayAs: selectedDate)
         }
     }
     
