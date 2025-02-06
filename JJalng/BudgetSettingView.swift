@@ -55,13 +55,10 @@ struct BudgetSettingView: View {
     var body: some View {
         VStack {
             
-            Text("💸 JJalrang 💸").font(.system(.title, design: .monospaced))
-                .foregroundColor(.green)
-                .fontWeight(.heavy)
-                .italic()
-            
-            Spacer()
-            
+            Image("JJalang")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 300, height: 300)
             
             Text("목표 예산")
                 .font(.title)
