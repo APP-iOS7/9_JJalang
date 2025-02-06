@@ -1,3 +1,10 @@
+//
+//  CalendarView.swift
+//  JJalng
+//
+//  Created by Saebyeok Jang on 2/4/25.
+//
+
 import SwiftUI
 import SwiftData
 
@@ -21,6 +28,52 @@ struct DateHeaderView: View {
                 .foregroundColor(.secondary)
         }
         .padding(.horizontal)
+    }
+}
+
+struct ExpenseRow: View {
+    let memo: String
+    let amount: Int
+    
+    var body: some View {
+        HStack {
+            Text("₩\(amount)")
+                .font(.body)
+                .foregroundColor(.primary)
+            Spacer()
+            Text(memo)
+                .font(.body)
+                .foregroundColor(.secondary)
+        }
+        .padding(.vertical, 5)
+    }
+}
+
+struct ExpenseSection: View {
+    @Binding var moneyStatus: MoneyStatus
+    let money: MoneyStatus
+    
+    var body: some View {
+        Section {
+            ForEach(Array(money.amount.enumerated()), id: \.element.id) { index, amount in
+                NavigationLink {
+                    DetailView(
+                        moneyStatus: $moneyStatus,
+                        selectedAmount: binding(for: amount)
+                    )
+                } label: {
+                    ExpenseRow(memo: money.amount[index].memo, amount: amount.amount)
+
+                }
+            }
+        }
+    }
+    
+    private func binding(for amount: AmountInfo) -> Binding<AmountInfo> {
+        guard let index = moneyStatus.amount.firstIndex(where: { $0.id == amount.id }) else {
+            fatalError("Amount not found")
+        }
+        return $moneyStatus.amount[index]
     }
 }
 
@@ -57,49 +110,6 @@ struct ExpenseListView: View {
     }
 }
 
-struct ExpenseSection: View {
-    @Binding var moneyStatus: MoneyStatus
-    let money: MoneyStatus
-    
-    var body: some View {
-        Section {
-            ForEach(Array(money.amount.enumerated()), id: \.element.id) { index, amount in
-                NavigationLink {
-                    DetailView(
-                        moneyStatus: $moneyStatus,
-                        selectedAmount: binding(for: amount)
-                    )
-                } label: {
-                    ExpenseRow(memo: money.amount[index].memo, amount: amount.amount)
-                }
-            }
-        }
-    }
-    
-    private func binding(for amount: AmountInfo) -> Binding<AmountInfo> {
-        guard let index = moneyStatus.amount.firstIndex(where: { $0.id == amount.id }) else {
-            fatalError("Amount not found")
-        }
-        return $moneyStatus.amount[index]
-    }
-}
-
-struct ExpenseRow: View {
-    let memo: String
-    let amount: Int
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(memo)
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-            Text("₩ \(amount)")
-                .font(.body)
-        }
-        .padding(.vertical, 5)
-    }
-}
-
 struct TotalAmountView: View {
     let totalSpent: Int
     
@@ -108,7 +118,7 @@ struct TotalAmountView: View {
             Text("총 지출")
                 .font(.headline)
                 .foregroundColor(.secondary)
-            Text("₩ \(totalSpent)")
+            Text("₩\(totalSpent)")
                 .font(.title)
                 .fontWeight(.bold)
         }
@@ -125,7 +135,7 @@ struct CalendarView: View {
     @Environment(\.modelContext) private var modelContext
     
     var totalSpent: Int {
-        moneyStatusList.flatMap { $0.amount }.reduce(0, { $0 + $1.amount })
+        moneyStatusList.flatMap { $0.amount }.reduce(0) { $0 + $1.amount }
     }
     
     var filteredMoneyStatus: [MoneyStatus] {
@@ -135,7 +145,7 @@ struct CalendarView: View {
     }
     
     var selectedDateTotal: Int {
-        filteredMoneyStatus.flatMap { $0.amount }.reduce(0, { $0 + $1.amount })
+        filteredMoneyStatus.flatMap { $0.amount }.reduce(0) { $0 + $1.amount }
     }
     
     var body: some View {
@@ -146,15 +156,12 @@ struct CalendarView: View {
                 .environment(\.locale, Locale(identifier: "ko"))
                 .accessibilityLabel("지출 내역 날짜 선택")
             
-            DateHeaderView(selectedDate: selectedDate,
-                         selectedDateTotal: selectedDateTotal)
+            DateHeaderView(selectedDate: selectedDate, selectedDateTotal: selectedDateTotal)
             
             ExpenseListView(
                 moneyStatusList: .init(
                     get: { self.moneyStatusList },
-                    set: { newValue in
-                        // SwiftData 업데이트 로직
-                    }
+                    set: { newValue in }
                 ),
                 filteredMoneyStatus: filteredMoneyStatus
             )
@@ -164,4 +171,8 @@ struct CalendarView: View {
         .navigationTitle("캘린더")
         .navigationBarTitleDisplayMode(.inline)
     }
+}
+
+#Preview {
+    CalendarView()
 }
