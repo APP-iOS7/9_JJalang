@@ -45,6 +45,10 @@ class MoneyStatus {
     var formattedDate: String {
         return MoneyStatus.dateFormatter.string(from: date)
     }
+    // 포맷된 목표날짜 문자열 반환
+    var formattedperiodTime: String {
+        return MoneyStatus.dateFormatter.string(from: periodTime)
+    }
     
     private static let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
