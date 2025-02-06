@@ -57,8 +57,6 @@ struct MemoInputView: View {
             existingMoneyStatus.amount.append(newAmount)
         } else {
             let newMoneyStatus = MoneyStatus(
-                memo: memo,
-                category: category,
                 date: date,
                 amount: [newAmount],
                 budget: 0,      // 초기 예산 값 (필요에 따라 조정)

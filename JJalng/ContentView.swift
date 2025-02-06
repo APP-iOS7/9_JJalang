@@ -42,7 +42,7 @@ struct ContentView: View {
     }
     
     private func addInitialMoneyStatus() {
-        let newMoneyStatus = MoneyStatus(memo: "", date: Date(), amount: [], budget: 0, targetTime: 1)
+        let newMoneyStatus = MoneyStatus(date: Date(), amount: [], budget: 0, targetTime: 1)
         modelContext.insert(newMoneyStatus)
     }
 }
@@ -71,7 +71,7 @@ struct HomeView: View {
                 Text("계획")
                     .font(.largeTitle)
                     .fontWeight(.heavy)
-                Text(moneyStatus.periodTime.description)
+                Text(moneyStatus.formattedDate)
                 Spacer()
                 
                 ZStack {
@@ -114,9 +114,6 @@ struct HomeView: View {
                         .foregroundColor(.white)
                         .cornerRadius(10)
                 }
-//                .sheet(isPresented: $showAddTransactionView) {
-//                    AddTransactionView(moneyStatus: moneyStatus, selectedTab: $selectedTab)
-//                }
                     Spacer()
                 }
             }
