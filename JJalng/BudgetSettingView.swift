@@ -172,5 +172,5 @@ struct BudgetSettingView: View {
 }
 
 #Preview {
-    BudgetSettingView(moneyStatus: MoneyStatus(memo: "", date: Date.now, budget: 0, targetTime: 1))
+    BudgetSettingView(moneyStatus: MoneyStatus(date: Date.now, budget: 0, targetTime: 1))
 }

@@ -11,23 +11,15 @@ import Foundation
 @Model
 class MoneyStatus {
     var id: String = UUID().uuidString
-    var memo: String
-    var category: String?
-    var date: Date
+    var date: Date  // 예산 목표 기간을 설정했던 시점이 저장되는 변수 (ex. 2월 6일에 생성 -> 2월 6일 저장)
     var amount: [AmountInfo]
     var budget: Int
     var targetTime: Int // 예산 목표 기간 (BudgetSettingView 의 enum 연관값)
 
-
-
-    init(memo: String,
-         category: String? = nil,
-         date: Date,
+    init(date: Date,
          amount: [AmountInfo] = [],
          budget: Int,
          targetTime: Int) {
-        self.memo = memo
-        self.category = category
         self.date = date
         self.amount = amount
         self.budget = budget
@@ -48,20 +40,21 @@ class MoneyStatus {
         let calendar = Calendar.current
         return calendar.date(byAdding: .day, value: targetTime, to: Date()) ?? Date()
     }
-}
 
-//@Model
-//final class AmountInfo {
-//    var amount: Int
-//    var category: String
-//    var date: Date
-//    
-//    init(amount: Int, category: String, date: Date) {
-//        self.amount = amount
-//        self.category = category
-//        self.date = date
-//    }
-//}
+    // 포맷된 날짜 문자열 반환
+    var formattedDate: String {
+        return MoneyStatus.dateFormatter.string(from: date)
+    }
+    
+    private static let dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "ko_KR")  // 한국 로케일
+        formatter.timeZone = TimeZone(identifier: "Asia/Seoul") // 한국 시간 (KST)
+        formatter.dateFormat = "yyyy년 MM월 dd일"
+        return formatter
+    }()
+    
+}
 
 @Model
 class AmountInfo: Identifiable {
@@ -69,7 +62,7 @@ class AmountInfo: Identifiable {
     var amount: Int
     var memo: String
     var category: String?
-    var date: Date
+    var date: Date  // 지출한 날짜
 
     init(amount: Int, memo: String = "", category: String? = nil, date: Date = Date()) {
         self.amount = amount
