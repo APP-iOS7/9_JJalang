@@ -124,7 +124,7 @@ struct TotalAmountView: View {
         .frame(maxWidth: .infinity)
         .padding()
         .background(Color(.systemBackground))
-        .shadow(radius: 2)
+//        .shadow(radius: 2)
     }
 }
 

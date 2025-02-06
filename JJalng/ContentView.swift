@@ -76,6 +76,8 @@ struct HomeView: View {
                     Text(" ~ ")
                     Text(moneyStatus.formattedperiodTime)
                 }
+                .padding()
+                
                 Spacer()
                 
                 ZStack {
