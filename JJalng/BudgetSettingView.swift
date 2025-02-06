@@ -54,14 +54,18 @@ struct BudgetSettingView: View {
     
     var body: some View {
         VStack {
-            Text("💸 JJalng 💸").font(.title)
-                .fontWeight(.bold)
+            
+            Text("💸 JJalng 💸").font(.system(.title, design: .monospaced))
+                .foregroundColor(.green)
+                .fontWeight(.heavy)
+                .italic()
+            
             Spacer()
             
             
-                Text("목표 예산")
-                    .font(.title)
-                    .fontWeight(.bold)
+            Text("목표 예산")
+                .font(.title)
+                .fontWeight(.bold)
             
             
             ZStack(alignment: .trailing) {
@@ -73,55 +77,61 @@ struct BudgetSettingView: View {
                     .onChange(of: budgetString) {
                         budgetString = formatInput(budgetString)
                     }
-                
+                    .background(Color.white)
+                        .cornerRadius(8)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(Color.green, lineWidth: 2) // 테두리 설정
+                        )
                 Text("₩")
-                    .font(.title2)
+                    .font(.subheadline)
                     .fontWeight(.bold)
                     .padding(.trailing)
             }
             .padding([.leading, .trailing])
             
+            
             Spacer()
             VStack() {
-                    Text("기간을 설정해주세요.")
-                        .font(.title)
-                        .fontWeight(.bold)
-                        .padding()
+                Text("기간을 설정해주세요.")
+                    .font(.title2)
+                    .fontWeight(.medium)
+                    .padding()
                 
                 
-                    Menu {
-                        ForEach(BudgetPeriod.allCases, id: \.self) { option in
-                            Button(option.rawValue) {
-                                selectedOption = option
-                                targetTime = option.days
-                            }
+                Menu {
+                    ForEach(BudgetPeriod.allCases, id: \.self) { option in
+                        Button(option.rawValue) {
+                            selectedOption = option
+                            targetTime = option.days
                         }
-                    } label: {
-                        HStack {
-                            Spacer()
-                            Text(selectedOption?.rawValue ?? "기간 선택")
-                                .font(.title2)
-                                .foregroundStyle(.black)
-                                .fontWeight(.bold)
-                            Spacer()
-                            Image(systemName: "chevron.down")
-                                .foregroundStyle(.black)
-                        }
-                        .frame(width: 200)
-                        .padding()
-                        .background(Color.gray.opacity(0.2))
-                        .cornerRadius(8)
                     }
+                } label: {
+                    HStack {
+                        Spacer()
+                        Text(selectedOption?.rawValue ?? "기간 선택")
+                            .font(.body)
+                            .foregroundStyle(.gray)
+//                            .fontWeight(.bold)
+                        Spacer()
+                        Image(systemName: "chevron.down")
+                            .foregroundStyle(.black)
+                    }
+                    .frame(width: 200)
+                    .padding()
+                    .background(Color(.systemGray6))
+                    .cornerRadius(8)
                 }
-                
+            }
+            
             
             Spacer()
             Button(action: saveBudgetAndTargetTime) {
                 HStack {
                     Text("확인")
                         .frame(minWidth: 300)
-                        .font(.title2)
-                        .fontWeight(.bold)
+                        .font(.headline)
+//                        .fontWeight(.bold)
                         .padding()
                         .background(Color.green)
                         .foregroundColor(.white)
@@ -132,7 +142,7 @@ struct BudgetSettingView: View {
         }
         .padding()
     }
-
+    
     private func saveBudgetAndTargetTime() {
         defer {
             dismiss()
@@ -155,7 +165,7 @@ struct BudgetSettingView: View {
         } else {
             print("기간을 선택해 주세요.")
         }
-
+        
     }
     
     private func formatInput(_ text: String) -> String {

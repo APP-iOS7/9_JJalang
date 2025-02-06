@@ -121,6 +121,7 @@ struct AddTransactionView: View {
                                 }
                             }
                     }
+                 
                     
                     // 날짜 선택 박스
                     VStack(alignment: .leading) {
@@ -167,7 +168,6 @@ struct AddTransactionView: View {
         }
     }
 }
-
 #Preview {
     AddTransactionView(moneyStatus: MoneyStatus(date: Date(), amount: [], budget: 0, targetTime: 1),
                        selectedTab: .constant(0))
