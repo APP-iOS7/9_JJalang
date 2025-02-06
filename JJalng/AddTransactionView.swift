@@ -15,6 +15,7 @@ struct AddTransactionView: View {
     @State private var selectedCategory: String = ""
     @State private var navigateToMemoInput: Bool = false
     @Binding var selectedTab: Int
+    @Environment(\.dismiss) private var dismiss
 
     let categories = [
         "🍽️ 식비",
@@ -100,6 +101,7 @@ struct AddTransactionView: View {
                     }
                 }
                     Spacer()
+                    .padding(120)
                     
                     Button(action: {
                         if amount != nil {
@@ -122,7 +124,8 @@ struct AddTransactionView: View {
                 MemoInputView(amount: amount ?? 0,
                               category: selectedCategory,
                               date: selectedDate,
-                              selectedTab: $selectedTab)
+                              selectedTab: $selectedTab,
+                              dismissAction: { dismiss() })
             }
         }
     }
