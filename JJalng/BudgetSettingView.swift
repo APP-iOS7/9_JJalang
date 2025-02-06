@@ -55,7 +55,7 @@ struct BudgetSettingView: View {
     var body: some View {
         VStack {
             
-            Text("💸 JJalng 💸").font(.system(.title, design: .monospaced))
+            Text("💸 JJalrang 💸").font(.system(.title, design: .monospaced))
                 .foregroundColor(.green)
                 .fontWeight(.heavy)
                 .italic()
