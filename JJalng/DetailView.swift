@@ -5,13 +5,6 @@
 //  Created by Saebyeok Jang on 2/4/25.
 //
 
-//
-//  SwiftUIView.swift
-//  JJalng
-//
-//  Created by Saebyeok Jang on 2/4/25.
-//
-
 import SwiftUI
 import SwiftData
 
@@ -19,13 +12,21 @@ struct DetailView: View {
     @Environment(\.presentationMode) private var presentationMode
     @Environment(\.modelContext) private var modelContext
     
-    var selectedAmount: AmountInfo  // @Binding 제거
+    var selectedAmount: AmountInfo
     @State private var amount: Int
     @State private var memo: String
     @State private var category: String?
     @State private var date: Date
     @State private var showDatePickerSheet: Bool = false
-
+    
+    init(selectedAmount: AmountInfo) {
+        self.selectedAmount = selectedAmount
+        _amount = State(initialValue: selectedAmount.amount)
+        _memo = State(initialValue: selectedAmount.memo)
+        _category = State(initialValue: selectedAmount.category)
+        _date = State(initialValue: selectedAmount.date)
+    }
+    
     private let categories = ["🍽️ 식비", "🚗 교통", "🛍 쇼핑", "🎮 여가", "💰 저축", "📂 기타"]
     
     var body: some View {
@@ -43,14 +44,14 @@ struct DetailView: View {
                 TextField("메모", text: $memo)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding()
-
+                
                 // CategoryPickerView 사용
                 CategoryPickerView(categories: categories,
                                    selectedCategory: Binding(
                                     get: { selectedAmount.category ?? "" },
                                     set: { selectedAmount.category = $0 }
                                    ))
-
+                
                 .padding()
                 
                 HStack {
@@ -106,9 +107,9 @@ struct DetailView: View {
                     .datePickerStyle(.graphical)
                     .padding()
                     .environment(\.locale, Locale(identifier: "ko"))
-
+                
                     .onChange(of: selectedAmount.date) { newValue, transaction in
-
+                        
                         showDatePickerSheet = false
                     }
                     .tint(.green)
