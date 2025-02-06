@@ -20,12 +20,7 @@ class MoneyStatus {
 
 
 
-    init(memo: String,
-         category: String? = nil,
-         date: Date,
-         amount: [AmountInfo] = [],
-         budget: Int,
-         targetTime: Int) {
+    init(memo: String, category: String? = nil, date: Date, amount: [AmountInfo] = [], budget: Int, targetTime: Int) {
         self.memo = memo
         self.category = category
         self.date = date
