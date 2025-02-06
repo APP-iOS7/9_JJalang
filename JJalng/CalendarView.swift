@@ -34,12 +34,18 @@ struct DateHeaderView: View {
 struct ExpenseRow: View {
     let memo: String
     let amount: Int
-    
+    let category: String
     var body: some View {
         HStack {
-            Text("₩\(amount)")
-                .font(.body)
-                .foregroundColor(.primary)
+            HStack{
+                Text(category)
+                    .foregroundStyle(.gray)
+                    .font(.caption)
+                Text(" ₩ \(amount)")
+                    .font(.body)
+                    .foregroundColor(.primary)
+                    .fontWeight(.semibold)
+            }
             Spacer()
             Text(memo)
                 .font(.body)
@@ -59,7 +65,7 @@ struct ExpenseSection: View {
                 NavigationLink {
                     DetailView(selectedAmount: amount)
                 } label: {
-                    ExpenseRow(memo: amount.memo, amount: amount.amount)
+                    ExpenseRow(memo: amount.memo, amount: amount.amount, category: amount.category ?? "")
                 }
             }
         }
