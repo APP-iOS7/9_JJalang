@@ -139,8 +139,12 @@ struct CalendarView: View {
     }
     
     var filteredMoneyStatus: [MoneyStatus] {
-        moneyStatusList.filter { _ in
-            Calendar.current.isDate(Date(), inSameDayAs: selectedDate)
+        moneyStatusList.filter { moneyStatus in
+            moneyStatus.amount.contains {
+                amountInfo in
+                
+                Calendar.current.isDate(amountInfo.date, inSameDayAs: selectedDate) // 수정
+            }
         }
     }
     
