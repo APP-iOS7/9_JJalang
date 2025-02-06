@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct MemoInputView: View {
     let amount: String
@@ -15,10 +16,11 @@ struct MemoInputView: View {
     @State private var memo: String = ""
     @Binding var selectedTab: Int
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var modelContext
 
     var body: some View {
         VStack {
-            Text("메모입력")
+            Text("메모 입력")
                 .font(.largeTitle)
                 .fontWeight(.bold)
                 .foregroundColor(.black)
@@ -30,17 +32,8 @@ struct MemoInputView: View {
                 .cornerRadius(10)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             
-            Button(action: {
-                // 메모 저장 로직
-                UserDefaults.standard.set(memo, forKey: "userMemo")
-                print("내용이 저장되었습니다: \(memo)")
-                
-                selectedTab = 0 // homeview로 이동
-                dismiss() // 
-                
-            }) {
+            Button(action: saveTransaction) {
                 Text("추가")
-//                    .font(.headline)
                     .frame(maxWidth: .infinity)
                     .padding()
                     .background(Color.green)
@@ -51,8 +44,39 @@ struct MemoInputView: View {
         .padding()
         .navigationTitle("메모 입력")
     }
+    
+    private func saveTransaction() {
+        // 금액 문자열을 정수로 변환
+        guard let amountValue = Int(amount) else { return }
+        
+        // 새 AmountInfo 객체 생성
+        let newAmount = AmountInfo(amount: amountValue, memo: memo, category: category, date: date)
+        
+        // 기존 MoneyStatus 객체를 가져와서 새 거래 추가. 없으면 새 MoneyStatus를 생성합니다.
+        if let existingMoneyStatus = try? modelContext.fetch(FetchDescriptor<MoneyStatus>()).first {
+            existingMoneyStatus.amount.append(newAmount)
+        } else {
+            let newMoneyStatus = MoneyStatus(
+                memo: memo,
+                category: category,
+                date: date,
+                amount: [newAmount],
+                budget: 0,      // 초기 예산 값 (필요에 따라 조정)
+                targetTime: 1   // 초기 목표 기간 (필요에 따라 조정)
+            )
+            modelContext.insert(newMoneyStatus)
+        }
+        
+        // 변경 사항 저장
+        try? modelContext.save()
+        
+        // 홈 탭으로 전환 후 뷰 종료
+        selectedTab = 0
+        dismiss()
+    }
 }
+
 #Preview {
-    MemoInputView(amount: "10000", category: "🍽️식비", date: Date(), selectedTab: .constant(0))
+    MemoInputView(amount: "10000", category: "🍽️ 식비", date: Date(), selectedTab: .constant(0))
 }
 
