@@ -69,19 +69,15 @@ struct HomeView: View {
                             .foregroundStyle(.green)
                     }
                 }
-                .padding()
-                Spacer()
-                Text("계획")
-                    .font(.largeTitle)
-                    .fontWeight(.heavy)
+                Image("JJalang")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 150, height: 150)
                 HStack {
                     Text(moneyStatus.formattedDate)
                     Text(" ~ ")
                     Text(moneyStatus.formattedperiodTime)
                 }
-                .padding()
-                
-                Spacer()
                 
                 ZStack {
                     Circle()
@@ -130,15 +126,15 @@ struct HomeView: View {
             }
         }
     }
-
-
+    
+    
     func progressPercentage() -> CGFloat {
-      // 특정 기간 내의 지출만 합산하여 반영
-      let filteredSpent = moneyStatus.filteredAmount.reduce(0) { $0 + $1.amount }
+        // 특정 기간 내의 지출만 합산하여 반영
+        let filteredSpent = moneyStatus.filteredAmount.reduce(0) { $0 + $1.amount }
         print(Double(filteredSpent) / Double(moneyStatus.budget))
-      return CGFloat(filteredSpent) / CGFloat(moneyStatus.budget)
+        return CGFloat(filteredSpent) / CGFloat(moneyStatus.budget)
     }
-   // guard moneyStatus.budget > 0 else { return 0 }
+    // guard moneyStatus.budget > 0 else { return 0 }
     private var budgetMessage: String {
         let filteredSpent = moneyStatus.filteredAmount.reduce(0) { $0 + $1.amount }
         let percentage = Double(filteredSpent) / Double(moneyStatus.budget)
@@ -154,8 +150,8 @@ struct HomeView: View {
         default:
             return " "
         }
-
-        }
+        
+    }
     
     private var budgetMessageColor: Color {
         let filteredSpent = moneyStatus.filteredAmount.reduce(0) { $0 + $1.amount }
