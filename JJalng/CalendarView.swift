@@ -55,14 +55,11 @@ struct ExpenseSection: View {
     
     var body: some View {
         Section {
-            ForEach(Array(money.amount.enumerated()), id: \.element.id) { index, amount in
+            ForEach(money.amount) { amount in
                 NavigationLink {
-                    DetailView(
-                        moneyStatus: $moneyStatus,
-                        selectedAmount: binding(for: amount)
-                    )
+                    DetailView(selectedAmount: binding(for: amount))
                 } label: {
-                    ExpenseRow(memo: money.amount[index].memo, amount: amount.amount)
+                    ExpenseRow(memo: amount.memo, amount: amount.amount)
                 }
             }
         }
@@ -103,7 +100,7 @@ struct ExpenseListView: View {
     
     private func binding(for money: MoneyStatus) -> Binding<MoneyStatus> {
         guard let index = moneyStatusList.firstIndex(where: { $0.id == money.id }) else {
-            fatalError("Money status not found")
+            return .constant(money) // 기본값 반환
         }
         return $moneyStatusList[index]
     }
@@ -137,16 +134,21 @@ struct CalendarView: View {
         moneyStatusList.flatMap { $0.amount }.reduce(0) { $0 + $1.amount }
     }
     
-    // 기존 코드는 매 MoneyStatus 요소에 대해 상수 값을 반환했으므로 수정합니다.
     var filteredMoneyStatus: [MoneyStatus] {
-
-        moneyStatusList.filter { moneyStatus in
-            moneyStatus.amount.contains {
-                amountInfo in
-                
-                Calendar.current.isDate(amountInfo.date, inSameDayAs: selectedDate) // 수정
+        moneyStatusList.compactMap { moneyStatus in
+            let filteredAmounts = moneyStatus.amount.filter { amountInfo in
+                Calendar.current.isDate(amountInfo.date, inSameDayAs: selectedDate) // 선택한 날짜 기준 필터링
             }
-
+            if filteredAmounts.isEmpty {
+                return nil // 선택한 날짜에 지출이 없으면 제외
+            } else {
+                return MoneyStatus(
+                    date: moneyStatus.date,
+                    amount: filteredAmounts, // 선택한 날짜의 지출만 포함
+                    budget: moneyStatus.budget,
+                    targetTime: moneyStatus.targetTime
+                )
+            }
         }
     }
     
@@ -161,6 +163,7 @@ struct CalendarView: View {
                 .padding()
                 .environment(\.locale, Locale(identifier: "ko"))
                 .accessibilityLabel("지출 내역 날짜 선택")
+                .tint(.green)
             
             DateHeaderView(selectedDate: selectedDate, selectedDateTotal: selectedDateTotal)
             
