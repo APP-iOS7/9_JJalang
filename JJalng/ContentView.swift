@@ -71,7 +71,11 @@ struct HomeView: View {
                 Text("계획")
                     .font(.largeTitle)
                     .fontWeight(.heavy)
-                Text(moneyStatus.formattedDate)
+                HStack {
+                    Text(moneyStatus.formattedDate)
+                    Text(" ~ ")
+                    Text(moneyStatus.formattedperiodTime)
+                }
                 Spacer()
                 
                 ZStack {
@@ -87,7 +91,7 @@ struct HomeView: View {
                         .animation(.easeInOut(duration: 1), value: moneyStatus.totalSpent)
                     
                     VStack {
-                        Text("이번 달 사용 금액")
+                        Text("사용 금액")
                             .font(.headline)
                         Text("₩ \(moneyStatus.totalSpent)")
                             .font(.title)
