@@ -37,11 +37,11 @@ struct ExpenseRow: View {
     
     var body: some View {
         HStack {
-            Text(memo)
+            Text("₩\(amount)")
                 .font(.body)
                 .foregroundColor(.primary)
             Spacer()
-            Text("₩\(amount)")
+            Text(memo)
                 .font(.body)
                 .foregroundColor(.secondary)
         }
@@ -161,9 +161,7 @@ struct CalendarView: View {
             ExpenseListView(
                 moneyStatusList: .init(
                     get: { self.moneyStatusList },
-                    set: { newValue in
-                        // 필요에 따라 SwiftData 업데이트 로직 구현
-                    }
+                    set: { newValue in }
                 ),
                 filteredMoneyStatus: filteredMoneyStatus
             )
