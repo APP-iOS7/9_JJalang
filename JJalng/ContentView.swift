@@ -10,28 +10,32 @@ struct ContentView: View {
     var moneyStatus: MoneyStatus? {
         moneyStatusList.first
     }
-    
     var body: some View {
         NavigationStack {
             if let moneyStatus = moneyStatusList.first {
-                TabView(selection: $selectedTab) {
-                    HomeView(moneyStatus: moneyStatus, selectedTab: $selectedTab)
-                        .tabItem {
-                            Label("홈", systemImage: "house.fill")
-                        }
-                        .tag(0)
-                    CalendarView()
-                        .tabItem {
-                            Label("달력", systemImage: "calendar")
-                        }
-                        .tag(1)
-                    SlotView()
-                        .tabItem {
-                            Label("오늘 뭐 먹지?", systemImage: "fork.knife")
-                        }
-                        .tag(2)
+                if moneyStatus.budget == 0 {
+                    BudgetSettingView(moneyStatus: moneyStatus)
+                        .navigationBarTitleDisplayMode(.inline)
+                } else {
+                    TabView(selection: $selectedTab) {
+                        HomeView(moneyStatus: moneyStatus, selectedTab: $selectedTab)
+                            .tabItem {
+                                Label("홈", systemImage: "house.fill")
+                            }
+                            .tag(0)
+                        CalendarView()
+                            .tabItem {
+                                Label("달력", systemImage: "calendar")
+                            }
+                            .tag(1)
+                        SlotView()
+                            .tabItem {
+                                Label("오늘 뭐 먹지?", systemImage: "fork.knife")
+                            }
+                            .tag(2)
+                    }
+                    .navigationBarTitleDisplayMode(.inline)
                 }
-                .navigationBarTitleDisplayMode(.inline)
             } else {
                 Text("데이터를 불러오는 중...")
                     .onAppear {
@@ -90,12 +94,12 @@ struct HomeView: View {
                         .stroke(AngularGradient(gradient: Gradient(colors: [.green, .yellow, .green]), center: .center), lineWidth: 20)
                         .rotationEffect(.degrees(-90))
                         .frame(width: 200, height: 200)
-                        .animation(.easeInOut(duration: 1), value: moneyStatus.totalSpent)
+                        .animation(.easeInOut(duration: 1), value: moneyStatus.filteredAmount)
                     
                     VStack {
                         Text("사용 금액")
                             .font(.headline)
-                        Text("₩ \(moneyStatus.totalSpent)")
+                        Text("₩ \(moneyStatus.filteredAmount.reduce(0) { $0 + $1.amount })")
                             .font(.title)
                             .bold()
                             .padding(.top, 10)
@@ -109,7 +113,10 @@ struct HomeView: View {
                 Text("/ ₩ \(moneyStatus.budget)")
                     .foregroundColor(.gray)
                 Spacer()
-                
+                Text(budgetMessage)
+                    .font(.headline)
+                    .foregroundColor(budgetMessageColor)
+                    .padding()
                 Button(action: {
                     showAddTransactionView = true
                 }) {
@@ -120,21 +127,48 @@ struct HomeView: View {
                         .foregroundColor(.white)
                         .cornerRadius(10)
                 }
-                    Spacer()
-                }
+                Spacer()
             }
         }
+    }
+    let filteredSpent = moneyStatus.filteredAmount.reduce(0) { $0 + $1.amount }
+
     func progressPercentage() -> CGFloat {
-        return CGFloat(min(Double(moneyStatus.totalSpent) / Double(moneyStatus.budget), 1.0))
-        
-        
+      // 특정 기간 내의 지출만 합산하여 반영
+      let filteredSpent = moneyStatus.filteredAmount.reduce(0) { $0 + $1.amount }
+
+      return CGFloat(filteredSpent) / CGFloat(moneyStatus.budget)
     }
+   // guard moneyStatus.budget > 0 else { return 0 }
+    private var budgetMessage: String {
+        let percentage = Double(moneyStatus.totalSpent) / Double(moneyStatus.budget)
+        if percentage == 0 {
+            return ""
+        } else if percentage < 0.5 {
+            return "예산의 절반 이하를 사용했어요"
+        } else if percentage < 0.8 {
+            return "예산의 절반 이상을 사용했어요"
+        } else if percentage < 1.0 {
+            return "예산의 80% 이상을 사용했어요"
+        } else {
+            return "예산을 초과했어요"
+        }
     }
-    
+    private var budgetMessageColor: Color {
+        let percentage = Double(moneyStatus.totalSpent) / Double(moneyStatus.budget)
+        if percentage < 0.5 {
+            return .green
+        } else if percentage < 0.8 {
+            return .orange
+        } else {
+            return .red
+            
+        }
+    }
+    #Preview {
+        ContentView()
+            .modelContainer(for: [MoneyStatus.self], inMemory: true)
+    }
+        
 
-
-
-#Preview {
-    ContentView()
-        .modelContainer(for: [MoneyStatus.self], inMemory: true)
 }
