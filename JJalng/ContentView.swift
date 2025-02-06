@@ -33,6 +33,7 @@ struct ContentView: View {
                             }
                             .tag(2)
                     }
+                    .accentColor(.green)
                     .navigationBarTitleDisplayMode(.inline)
                 }
             } else {

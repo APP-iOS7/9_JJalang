@@ -141,7 +141,7 @@ struct UpdateBudgetView: View {
                 }
                 .frame(width: 400)
             }
-            Text("기간을 수정하면 주기를 새롭게 시작합니다.")
+            Text("기간을 수정하면 시작일이 새롭게 시작됩니다.")
                 .font(.caption)
             Spacer()
         }
@@ -150,6 +150,9 @@ struct UpdateBudgetView: View {
     
     // 기간을 새로 갱신하면 moneyStatus.date도 현재 시간으로 설정되며, 새로운 목표 기간(홈 화면의 Circle)이 시작 된다.
     private func editTargetTime() {
+        defer {
+            dismiss()
+        }
         moneyStatus.targetTime = targetTime
         moneyStatus.date = Date()
         try? modelContext.save()
