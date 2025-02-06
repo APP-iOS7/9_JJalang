@@ -140,6 +140,7 @@ struct SlotView: View {
             
             reelsView
             spinButton
+            
             VStack {
                 Text("남은 예산이...")
                 HStack {
@@ -148,7 +149,7 @@ struct SlotView: View {
                     Text("원")
                 }
             }
-            .padding(.top, 30)
+            .padding(.top, 80)
         }
         .padding()
     }
@@ -206,9 +207,6 @@ struct SlotView: View {
         var finalIndex: Int = 0
         
         withAnimation(.interactiveSpring()) {
-            defer {
-                print(finalIndex)
-            }
             offsets = offsets.map { currentOffset in
                 let centeringOffset = itemHeight / 2
                 // 절대값의 음수 부호를 고려한 정확한 인덱스 계산
