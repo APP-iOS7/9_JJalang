@@ -121,7 +121,7 @@ struct AddTransactionView: View {
                     // 추가 버튼
                     Button(action: {
                         if let amountValue = Int(amount) {
-                            addTransaction(amount: amountValue)
+//                            addTransaction(amount: amountValue)
                             navigateToMemoInput = true //
                         }
                     }) {
