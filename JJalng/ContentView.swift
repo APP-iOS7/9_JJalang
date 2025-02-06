@@ -95,7 +95,7 @@ struct HomeView: View {
                             .padding(.top, 10)
                     }
                     .navigationDestination(isPresented: $showAddTransactionView) {
-                        AddTransactionView(selectedTab: $selectedTab)
+                        AddTransactionView(moneyStatus: moneyStatus, selectedTab: $selectedTab)
                     }
                     Spacer()
                 }
@@ -115,19 +115,21 @@ struct HomeView: View {
                         .cornerRadius(10)
                 }
                 .sheet(isPresented: $showAddTransactionView) {
-                    AddTransactionView(selectedTab: $selectedTab) }
-                Spacer()
+                    AddTransactionView(moneyStatus: moneyStatus, selectedTab: $selectedTab)
+                }
+                    Spacer()
+                }
             }
         }
-
-    }
-    
     func progressPercentage() -> CGFloat {
         return CGFloat(min(Double(moneyStatus.totalSpent) / Double(moneyStatus.budget), 1.0))
         
         
     }
-}
+    }
+    
+
+
 
 #Preview {
     ContentView()
