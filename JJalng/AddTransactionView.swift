@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct AddTransactionView: View {
+    @Environment(\.modelContext) private var modelContext
+    @Bindable var moneyStatus: MoneyStatus
     @State private var amount: String = ""
     @State private var selectedDate: Date = Date()
     @State private var selectedCategory: String = "🍽️ 식비"
@@ -15,7 +17,7 @@ struct AddTransactionView: View {
     @State private var navigateToMemoInput:Bool = false
     @Binding var selectedTab: Int
     
-let categories = [
+    let categories = [
         "🍽️ 식비",
         "🚗 교통",
         "🛍 쇼핑",
@@ -118,8 +120,8 @@ let categories = [
                     
                     // 추가 버튼
                     Button(action: {
-                        if let amountValue = Double(amount) {
-                            print("지출 추가: \(amountValue)원, 카테고리: \(selectedCategory), 날짜: \(selectedDate)")
+                        if let amountValue = Int(amount) {
+                            addTransaction(amount: amountValue)
                             navigateToMemoInput = true //
                         }
                     }) {
@@ -136,13 +138,32 @@ let categories = [
                 }
                 .padding()
             }
+            //            private func addTransaction(amount: Int) {
+            //                if let moneyStatus = moneyStatusList.first {
+            //                    let newAmountInfo = AmountInfo(amount: amount, category: selectedCategory, date: selectedDate)
+            //
+            //                    moneyStatus.amount.append(newAmountInfo)
+            //                    try? modelContext.save()
+            //                }
+            //            }
             .navigationDestination(isPresented: $navigateToMemoInput) {
                 MemoInputView(amount: amount, category: selectedCategory, date: selectedDate, selectedTab: $selectedTab)
             }
         }
     }
+    
+    private func addTransaction(amount: Int) {
+        let newAmountInfo = AmountInfo(amount: amount, category: selectedCategory, date: selectedDate)
+        
+        moneyStatus.amount.append(newAmountInfo)
+        try? modelContext.save()
+    }
 }
+    
 
 #Preview {
-    AddTransactionView(selectedTab: .constant(0))
+    AddTransactionView(moneyStatus: MoneyStatus(backingData: <#any BackingData<MoneyStatus>#>),
+                       
+                       selectedTab: .constant(0))
+    .modelContainer(for: MoneyStatus.self)
 }
