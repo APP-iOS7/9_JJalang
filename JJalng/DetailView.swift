@@ -86,5 +86,6 @@ struct DetailView: View {
         } catch {
             print("저장 실패: \(error)")
         }
+        presentationMode.wrappedValue.dismiss()
     }
 }
