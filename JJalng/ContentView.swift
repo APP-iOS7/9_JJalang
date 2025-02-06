@@ -114,9 +114,9 @@ struct HomeView: View {
                         .foregroundColor(.white)
                         .cornerRadius(10)
                 }
-                .sheet(isPresented: $showAddTransactionView) {
-                    AddTransactionView(moneyStatus: moneyStatus, selectedTab: $selectedTab)
-                }
+//                .sheet(isPresented: $showAddTransactionView) {
+//                    AddTransactionView(moneyStatus: moneyStatus, selectedTab: $selectedTab)
+//                }
                     Spacer()
                 }
             }
