@@ -49,7 +49,7 @@ struct AddTransactionView: View {
                     
                     CategoryPickerView(categories: categories,
                                        selectedCategory: $selectedCategory)
-                    .padding()
+                    //                    .padding()
                     
                     // 금액 입력 박스
                     VStack(alignment: .leading) {
@@ -95,6 +95,8 @@ struct AddTransactionView: View {
                         }
                         .frame(height: 50)
                     }
+                }
+                    Spacer()
                     
                     // 추가 버튼
                     Button(action: {
@@ -110,7 +112,7 @@ struct AddTransactionView: View {
                             .foregroundColor(.white)
                             .cornerRadius(10)
                     }
-                    .padding(.bottom, 20)
+//                    .padding(.bottom, 20)
                 }
                 .padding()
             }
@@ -122,7 +124,6 @@ struct AddTransactionView: View {
             }
         }
     }
-}
 
 #Preview {
     AddTransactionView(moneyStatus: MoneyStatus(date: Date(), amount: [], budget: 0, targetTime: 1),
