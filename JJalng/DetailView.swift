@@ -11,7 +11,6 @@ import SwiftData
 struct DetailView: View {
     @Environment(\.presentationMode) private var presentationMode
     @Environment(\.modelContext) private var modelContext
-    @Binding var moneyStatus: MoneyStatus
     @Binding var selectedAmount: AmountInfo
     @State private var showDatePickerSheet: Bool = false
 
@@ -39,6 +38,7 @@ struct DetailView: View {
                 .padding()
                 
                 HStack {
+                    Text(dateFormatter(date: selectedAmount.date))
                     Spacer()
                     Button(action: {
                         showDatePickerSheet = true
@@ -92,6 +92,7 @@ struct DetailView: View {
                     .onChange(of: selectedAmount.date) {
                         showDatePickerSheet = false
                     }
+                    .tint(.green)
                 
                 Button("닫기") {
                     showDatePickerSheet = false
@@ -101,62 +102,26 @@ struct DetailView: View {
         }
     }
     
-    private func formattedDate(_ date: Date) -> String {
+    private func dateFormatter(date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "ko_KR")
-        formatter.timeZone = TimeZone(identifier: "Asia/Seoul")
+        formatter.locale = Locale(identifier: "ko_KR")  // 한국 로케일
+        formatter.timeZone = TimeZone(identifier: "Asia/Seoul") // 한국 시간 (KST)
         formatter.dateFormat = "yyyy년 MM월 dd일"
         return formatter.string(from: date)
     }
-    
+
     private func deleteSelectedAmount() {
-        if let index = moneyStatus.amount.firstIndex(where: { $0.id == selectedAmount.id }) {
-            moneyStatus.amount.remove(at: index)
-            try? modelContext.save()
-        }
+        modelContext.delete(selectedAmount)  // 개별 AmountInfo 삭제
+        try? modelContext.save()  // 변경사항 저장
         presentationMode.wrappedValue.dismiss()
     }
     
     private func saveChanges() {
-        let newTransactionDate = Calendar.current.startOfDay(for: selectedAmount.date)
-        let currentContainerDate = Calendar.current.startOfDay(for: moneyStatus.date)
-        
-        if newTransactionDate != currentContainerDate {
-            let transactionToMove = selectedAmount
-            
-            if let index = moneyStatus.amount.firstIndex(where: { $0.id == transactionToMove.id }) {
-                moneyStatus.amount.remove(at: index)
-            }
-            
-            let nextDay = Calendar.current.date(byAdding: .day, value: 1, to: newTransactionDate)!
-            let predicate: Predicate<MoneyStatus> = #Predicate { money in
-                money.date >= newTransactionDate && money.date < nextDay
-            }
-            let fetchDescriptor = FetchDescriptor<MoneyStatus>(predicate: predicate)
-            
-            if let targetContainer = try? modelContext.fetch(fetchDescriptor).first {
-                targetContainer.amount.append(transactionToMove)
-            } else {
-                let newContainer = MoneyStatus(
-                    date: newTransactionDate,
-                    amount: [transactionToMove],
-                    budget: moneyStatus.budget,
-                    targetTime: moneyStatus.targetTime
-                )
-                modelContext.insert(newContainer)
-            }
-            
-            if moneyStatus.amount.isEmpty {
-                modelContext.delete(moneyStatus)
-            }
-        }
-        
         do {
-            try modelContext.save()
+            try modelContext.save()  // AmountInfo 수정 후 저장
         } catch {
             print("저장 실패: \(error)")
         }
-        
         presentationMode.wrappedValue.dismiss()
     }
 }

@@ -135,6 +135,7 @@ struct AddTransactionView: View {
                             DatePicker("", selection: $selectedDate, displayedComponents: .date)
                                 .labelsHidden()
                                 .padding(.horizontal)
+                                .tint(.green)
                         }
                         .frame(height: 50)
                     }

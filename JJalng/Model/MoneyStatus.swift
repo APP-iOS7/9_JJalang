@@ -30,8 +30,13 @@ class MoneyStatus {
         amount.reduce(0) { $0 + $1.amount }
     }
     
-    var remainingBudget: Int {
-        budget - totalSpent
+    var filteredAmount: [AmountInfo] {
+        amount.filter { $0.date >= date && $0.date <= periodTime }
+    }
+    
+    var filteredAmountByDate: [AmountInfo] {
+        let calendar = Calendar.current
+        return amount.filter { calendar.isDate($0.date, inSameDayAs: date) }
     }
     
     // Date 에 targetTime 만큼을 더한 Date 변수
