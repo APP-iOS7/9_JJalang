@@ -10,7 +10,6 @@ struct ContentView: View {
     var moneyStatus: MoneyStatus? {
         moneyStatusList.first
     }
-    
     var body: some View {
         NavigationStack {
             if let moneyStatus = moneyStatusList.first {
@@ -93,12 +92,12 @@ struct HomeView: View {
                         .stroke(AngularGradient(gradient: Gradient(colors: [.green, .yellow, .green]), center: .center), lineWidth: 20)
                         .rotationEffect(.degrees(-90))
                         .frame(width: 200, height: 200)
-                        .animation(.easeInOut(duration: 1), value: moneyStatus.totalSpent)
+                        .animation(.easeInOut(duration: 1), value: moneyStatus.filteredAmount)
                     
                     VStack {
                         Text("사용 금액")
                             .font(.headline)
-                        Text("₩ \(moneyStatus.totalSpent)")
+                        Text("₩ \(moneyStatus.filteredAmount.reduce(0) { $0 + $1.amount })")
                             .font(.title)
                             .bold()
                             .padding(.top, 10)
@@ -130,9 +129,15 @@ struct HomeView: View {
             }
         }
     }
+    let filteredSpent = moneyStatus.filteredAmount.reduce(0) { $0 + $1.amount }
+
     func progressPercentage() -> CGFloat {
-        return CGFloat(min(Double(moneyStatus.totalSpent) / Double(moneyStatus.budget), 1.0))
+      // 특정 기간 내의 지출만 합산하여 반영
+      let filteredSpent = moneyStatus.filteredAmount.reduce(0) { $0 + $1.amount }
+
+      return CGFloat(filteredSpent) / CGFloat(moneyStatus.budget)
     }
+   // guard moneyStatus.budget > 0 else { return 0 }
     private var budgetMessage: String {
         let percentage = Double(moneyStatus.totalSpent) / Double(moneyStatus.budget)
         if percentage == 0 {
@@ -162,4 +167,6 @@ struct HomeView: View {
         ContentView()
             .modelContainer(for: [MoneyStatus.self], inMemory: true)
     }
+        
+
 }
