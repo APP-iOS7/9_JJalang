@@ -8,7 +8,7 @@
 import SwiftUI
 import SwiftData
 
-struct BudgetSettingView: View {
+struct UpdateBudgetView: View {
     enum BudgetPeriod: String, CaseIterable {
         case oneWeek = "1주"
         case twoWeeks = "2주"
@@ -33,14 +33,15 @@ struct BudgetSettingView: View {
         }
     }
     
-    @State private var budget: Int
+    @State private var budget: Int = 0
     @State private var date: Date
-    @State private var targetTime: Int
+    @State private var targetTime: Int = 0
     @State private var budgetString: String = ""
     @State private var selectedDate: Int = 0
-    @State private var selectedOption: BudgetPeriod?
+    @State private var selectedOption: BudgetPeriod = .oneWeek
     @Environment(\.modelContext) private var modelContext
     @Query private var moneyStatusList: [MoneyStatus]
+    
     let moneyStatus: MoneyStatus
     
     init(moneyStatus: MoneyStatus) {
@@ -54,15 +55,11 @@ struct BudgetSettingView: View {
     
     var body: some View {
         VStack {
-            Text("💸 JJalng 💸").font(.title)
-                .fontWeight(.bold)
             Spacer()
             
-            
-                Text("목표 예산")
-                    .font(.title)
-                    .fontWeight(.bold)
-            
+            Text("목표 예산 수정")
+                .font(.title)
+                .fontWeight(.bold)
             
             ZStack(alignment: .trailing) {
                 TextField("\(moneyStatus.budget)", text: $budgetString)
@@ -79,46 +76,11 @@ struct BudgetSettingView: View {
                     .fontWeight(.bold)
                     .padding(.trailing)
             }
-            .padding([.leading, .trailing])
+            .padding()
             
-            Spacer()
-            VStack() {
-                    Text("기간을 설정해주세요.")
-                        .font(.title)
-                        .fontWeight(.bold)
-                        .padding()
-                
-                
-                    Menu {
-                        ForEach(BudgetPeriod.allCases, id: \.self) { option in
-                            Button(option.rawValue) {
-                                selectedOption = option
-                                targetTime = option.days
-                            }
-                        }
-                    } label: {
-                        HStack {
-                            Spacer()
-                            Text(selectedOption?.rawValue ?? "기간 선택")
-                                .font(.title2)
-                                .foregroundStyle(.black)
-                                .fontWeight(.bold)
-                            Spacer()
-                            Image(systemName: "chevron.down")
-                                .foregroundStyle(.black)
-                        }
-                        .frame(width: 200)
-                        .padding()
-                        .background(Color.gray.opacity(0.2))
-                        .cornerRadius(8)
-                    }
-                }
-                
-            
-            Spacer()
-            Button(action: saveBudgetAndTargetTime) {
+            Button(action: editBudget) {
                 HStack {
-                    Text("확인")
+                    Text("수정하기")
                         .frame(minWidth: 300)
                         .font(.title2)
                         .fontWeight(.bold)
@@ -129,33 +91,87 @@ struct BudgetSettingView: View {
                 }
                 .frame(width: 400)
             }
+            
+            Spacer()
+            
+            VStack {
+                Text("기간을 새로 갱신")
+                    .font(.title)
+                    .fontWeight(.bold)
+                    .padding()
+                
+                HStack {
+                    Menu {
+                        ForEach(BudgetPeriod.allCases, id: \.self) { option in
+                            Button(option.rawValue) {
+                                selectedOption = option
+                                targetTime = option.days
+                            }
+                        }
+                    } label: {
+                        HStack {
+                            Spacer()
+                            Text(selectedOption.rawValue)
+                                .font(.title2)
+                                .foregroundStyle(.black)
+                                .fontWeight(.bold)
+                            Spacer()
+                            Image(systemName: "chevron.down")
+                                .foregroundStyle(.black)
+                        }
+                        .frame(width: 100)
+                        .padding()
+                        .background(Color.gray.opacity(0.2))
+                        .cornerRadius(8)
+                    }
+                    Text("동안").font(.title)
+                }
+                
+            }
+            Button(action: editTargetTime) {
+                HStack {
+                    Text("수정하기")
+                        .frame(minWidth: 300)
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .padding()
+                        .background(Color.green)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                }
+                .frame(width: 400)
+            }
+            Text("기간을 수정하면 주기를 새롭게 시작합니다.")
+                .font(.caption)
+            Spacer()
         }
         .padding()
     }
+    
+    // 기간을 새로 갱신하면 moneyStatus.date도 현재 시간으로 설정되며, 새로운 목표 기간(홈 화면의 Circle)이 시작 된다.
+    private func editTargetTime() {
+        moneyStatus.targetTime = targetTime
+        moneyStatus.date = Date()
+        try? modelContext.save()
+        print("목표기간이 수정되었습니다: \(targetTime)")
+    }
 
-    private func saveBudgetAndTargetTime() {
+
+    private func editBudget() {
         defer {
             dismiss()
         }
-        if selectedOption != nil {
-            moneyStatus.targetTime = targetTime
-            moneyStatus.date = Date()
-            
-            let formatter = NumberFormatter()
-            formatter.numberStyle = .decimal
-            
-            if let formattedNumber = formatter.number(from: budgetString) {
-                let newBudget = formattedNumber.intValue
-                moneyStatus.budget = newBudget
-                try? modelContext.save()
-                print("예산이 설정되었습니다: \(newBudget)")
-            } else {
-                print("유효한 숫자가 아닙니다.")
-            }
-        } else {
-            print("기간을 선택해 주세요.")
-        }
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
 
+        if let formattedNumber = formatter.number(from: budgetString) {
+            let newBudget = formattedNumber.intValue
+            moneyStatus.budget = newBudget
+            try? modelContext.save()
+            print("예산이 설정되었습니다: \(newBudget)")
+        } else {
+            print("유효한 숫자가 아닙니다.")
+        }
     }
     
     private func formatInput(_ text: String) -> String {
@@ -172,5 +188,5 @@ struct BudgetSettingView: View {
 }
 
 #Preview {
-    BudgetSettingView(moneyStatus: MoneyStatus(memo: "", date: Date.now, budget: 0, targetTime: 1))
+    UpdateBudgetView(moneyStatus: MoneyStatus(memo: "", date: Date.now, budget: 0, targetTime: 1))
 }

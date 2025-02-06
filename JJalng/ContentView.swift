@@ -27,7 +27,7 @@ struct ContentView: View {
                         .tag(1)
                     SlotView()
                         .tabItem {
-                            Label("슬롯", systemImage: "fork.knife")
+                            Label("오늘 뭐 먹지?", systemImage: "fork.knife")
                         }
                         .tag(2)
                 }
@@ -42,7 +42,7 @@ struct ContentView: View {
     }
     
     private func addInitialMoneyStatus() {
-        let newMoneyStatus = MoneyStatus(memo: "", date: Date(), amount: [], budget: 0)
+        let newMoneyStatus = MoneyStatus(memo: "", date: Date(), amount: [], budget: 0, targetTime: 1)
         modelContext.insert(newMoneyStatus)
     }
 }
@@ -57,12 +57,21 @@ struct HomeView: View {
     var body: some View {
         VStack {
             if moneyStatus.budget == 0 {
-                BudgetSettingView()
+                BudgetSettingView(moneyStatus: moneyStatus)
             } else {
+                HStack {
+                    Spacer()
+                    NavigationLink(destination: UpdateBudgetView(moneyStatus: moneyStatus)) {
+                        Image(systemName: "gearshape.fill")
+                            .foregroundStyle(.green)
+                    }
+                }
+                .padding()
                 Spacer()
                 Text("계획")
                     .font(.largeTitle)
                     .fontWeight(.heavy)
+                Text(moneyStatus.periodTime.description)
                 Spacer()
                 
                 ZStack {
@@ -97,9 +106,6 @@ struct HomeView: View {
                 
                 Button(action: {
                     showAddTransactionView = true
-//                    let newAmountInfo = AmountInfo(amount: 50000)
-//                    moneyStatus.amount.append(newAmountInfo)
-//                    try? modelContext.save()
                 }) {
                     Text("지출 추가")
                         .fontWeight(.bold)
@@ -113,11 +119,7 @@ struct HomeView: View {
                 Spacer()
             }
         }
-//<<<<<<< HEAD
-//=======
-////            .padding()
-//>>>>>>> e41bd66 (로컬 변경 사항 저장)
-       
+
     }
     
     func progressPercentage() -> CGFloat {
