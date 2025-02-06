@@ -16,6 +16,9 @@ class MoneyStatus {
     var date: Date
     var amount: [AmountInfo]
     var budget: Int
+    var totalSpent: Int {
+        amount.reduce(0) { $0 + $1.amount }
+    }
 
     init(memo: String, category: String? = nil, date: Date, amount: [AmountInfo] = [], budget: Int) {
         self.memo = memo
@@ -25,27 +28,40 @@ class MoneyStatus {
         self.budget = budget
     }
 
-    var totalSpent: Int {   // 전체 소비
-        amount.reduce(0) { $0 + $1.amount }
-    }
+//    var totalSpent: Int {   // 전체 소비
+//        amount.reduce(0) { $0 + $1.amount }
+//    }
 
-    var remainingBudget: Int {  
-        budget - totalSpent
-    }
+//    var remainingBudget: Int {  
+//        budget - totalSpent
+//    }
 }
 
 @Model
-class AmountInfo: Identifiable {
-    var id: String = UUID().uuidString
+final class AmountInfo {
     var amount: Int
-    var memo: String
-    var category: String?
+    var category: String
     var date: Date
-
-    init(amount: Int, memo: String = "", category: String? = nil, date: Date = Date()) {
+    
+    init(amount: Int, category: String, date: Date) {
         self.amount = amount
-        self.memo = memo
         self.category = category
         self.date = date
     }
 }
+
+//@Model
+//class AmountInfo: Identifiable {
+//    var id: String = UUID().uuidString
+//    var amount: Int
+//    var memo: String
+//    var category: String?
+//    var date: Date
+//
+//    init(amount: Int, memo: String = "", category: String? = nil, date: Date = Date()) {
+//        self.amount = amount
+//        self.memo = memo
+//        self.category = category
+//        self.date = date
+//    }
+//}

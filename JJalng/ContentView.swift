@@ -49,7 +49,7 @@ struct ContentView: View {
 
 struct HomeView: View {
     @Environment(\.modelContext) private var modelContext
-    var moneyStatus: MoneyStatus
+    @Bindable var moneyStatus: MoneyStatus
     @State private var tempBudget: String = ""
     @Binding var selectedTab: Int
     @State private var showAddTransactionView = false
@@ -97,9 +97,9 @@ struct HomeView: View {
                 
                 Button(action: {
                     showAddTransactionView = true
-                    let newAmountInfo = AmountInfo(amount: 50000)
-                    moneyStatus.amount.append(newAmountInfo)
-                    try? modelContext.save()
+//                    let newAmountInfo = AmountInfo(amount: 50000)
+//                    moneyStatus.amount.append(newAmountInfo)
+//                    try? modelContext.save()
                 }) {
                     Text("지출 추가")
                         .fontWeight(.bold)
@@ -108,13 +108,16 @@ struct HomeView: View {
                         .foregroundColor(.white)
                         .cornerRadius(10)
                 }
+                .sheet(isPresented: $showAddTransactionView) {
+                    AddTransactionView(selectedTab: $selectedTab) }
                 Spacer()
             }
+        }
 //<<<<<<< HEAD
 //=======
 ////            .padding()
 //>>>>>>> e41bd66 (로컬 변경 사항 저장)
-        }
+       
     }
     
     func progressPercentage() -> CGFloat {
