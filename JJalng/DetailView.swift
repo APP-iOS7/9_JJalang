@@ -89,7 +89,7 @@ struct DetailView: View {
                     .datePickerStyle(.graphical)
                     .padding()
                     .environment(\.locale, Locale(identifier: "ko"))
-                    .onChange(of: selectedAmount.date) { _ in
+                    .onChange(of: selectedAmount.date) {
                         showDatePickerSheet = false
                     }
                 
