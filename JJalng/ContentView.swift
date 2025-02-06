@@ -27,7 +27,7 @@ struct ContentView: View {
                                 Label("달력", systemImage: "calendar")
                             }
                             .tag(1)
-                        SlotView()
+                        SlotView(moneyStatus: moneyStatus)
                             .tabItem {
                                 Label("오늘 뭐 먹지?", systemImage: "fork.knife")
                             }
