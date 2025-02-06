@@ -9,7 +9,7 @@ import SwiftUI
 import SwiftData
 
 struct MemoInputView: View {
-    let amount: String
+    let amount: Int
     let category: String
     let date: Date
 //    let addTransaction: (Int) ->Void
@@ -48,7 +48,7 @@ struct MemoInputView: View {
     
     private func saveTransaction() {
         // 금액 문자열을 정수로 변환
-        guard let amountValue = Int(amount) else { return }
+        let amountValue = amount
         
         // 새 AmountInfo 객체 생성
         let newAmount = AmountInfo(amount: amountValue, memo: memo, category: category, date: date)
@@ -76,6 +76,6 @@ struct MemoInputView: View {
 }
 
 #Preview {
-    MemoInputView(amount: "10000", category: "🍽️ 식비", date: Date(), selectedTab: .constant(0))
+    MemoInputView(amount: 10000, category: "🍽️ 식비", date: Date(), selectedTab: .constant(0))
 }
 
