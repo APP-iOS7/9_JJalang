@@ -155,7 +155,7 @@ struct UpdateBudgetView: View {
             dismiss()
         }
         moneyStatus.targetTime = targetTime
-        moneyStatus.date = Date()
+        moneyStatus.date = Calendar.current.startOfDay(for: Date()) // 오늘 날짜의 00:00:00 를 저장
         try? modelContext.save()
         print("목표기간이 수정되었습니다: \(targetTime)")
     }
