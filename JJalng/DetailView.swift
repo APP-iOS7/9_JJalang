@@ -5,6 +5,13 @@
 //  Created by Saebyeok Jang on 2/4/25.
 //
 
+//
+//  SwiftUIView.swift
+//  JJalng
+//
+//  Created by Saebyeok Jang on 2/4/25.
+//
+
 import SwiftUI
 import SwiftData
 
@@ -19,14 +26,8 @@ struct DetailView: View {
     @State private var date: Date
     @State private var showDatePickerSheet: Bool = false
 
-    init(selectedAmount: AmountInfo) {
-        self.selectedAmount = selectedAmount
-        _amount = State(initialValue: selectedAmount.amount)
-        _memo = State(initialValue: selectedAmount.memo)
-        _category = State(initialValue: selectedAmount.category)
-        _date = State(initialValue: selectedAmount.date)
-    }
-
+    private let categories = ["🍽️ 식비", "🚗 교통", "🛍 쇼핑", "🎮 여가", "💰 저축", "📂 기타"]
+    
     var body: some View {
         VStack {
             Text("지출 상세 내역")
@@ -42,12 +43,14 @@ struct DetailView: View {
                 TextField("메모", text: $memo)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding()
-                
-                TextField("카테고리", text: Binding(
-                    get: { category ?? "" },
-                    set: { category = $0.isEmpty ? nil : $0 }
-                ))
-                .textFieldStyle(RoundedBorderTextFieldStyle())
+
+                // CategoryPickerView 사용
+                CategoryPickerView(categories: categories,
+                                   selectedCategory: Binding(
+                                    get: { selectedAmount.category ?? "" },
+                                    set: { selectedAmount.category = $0 }
+                                   ))
+
                 .padding()
                 
                 HStack {
@@ -96,13 +99,16 @@ struct DetailView: View {
         }
         .padding()
         .navigationBarTitle("지출 상세", displayMode: .inline)
+        // 날짜 선택 sheet
         .sheet(isPresented: $showDatePickerSheet) {
             VStack {
                 DatePicker("날짜 선택", selection: $date, displayedComponents: [.date])
                     .datePickerStyle(.graphical)
                     .padding()
                     .environment(\.locale, Locale(identifier: "ko"))
-                    .onChange(of: date) {
+
+                    .onChange(of: selectedAmount.date) { newValue, transaction in
+
                         showDatePickerSheet = false
                     }
                     .tint(.green)
@@ -122,7 +128,7 @@ struct DetailView: View {
         formatter.dateFormat = "yyyy년 MM월 dd일"
         return formatter.string(from: date)
     }
-
+    
     private func deleteSelectedAmount() {
         modelContext.delete(selectedAmount)
         try? modelContext.save()
