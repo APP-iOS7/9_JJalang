@@ -71,6 +71,7 @@ struct HomeView: View {
                     .foregroundColor(budgetMessageColor)
                     .padding()
                 Button(action: {
+                    SoundManager.shared.playSound(sound: "JJalangSound")
                     showAddTransactionView = true
                 }) {
                     Text("지출 추가")
