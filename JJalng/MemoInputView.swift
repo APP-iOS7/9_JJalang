@@ -12,6 +12,7 @@ struct MemoInputView: View {
     let amount: String
     let category: String
     let date: Date
+//    let addTransaction: (Int) ->Void
     
     @State private var memo: String = ""
     @Binding var selectedTab: Int

@@ -121,7 +121,7 @@ struct AddTransactionView: View {
                     // 추가 버튼
                     Button(action: {
                         if Int(amount) != nil {
-//                            addTransaction(amount: amountValue)
+                            //                            addTransaction(amount: amountValue)
                             navigateToMemoInput = true //
                         }
                     }) {
@@ -151,19 +151,25 @@ struct AddTransactionView: View {
             }
         }
     }
-    
-    private func addTransaction(amount: Int) {
-        let newAmountInfo = AmountInfo(amount: amount, category: selectedCategory, date: selectedDate)
-        
-        moneyStatus.amount.append(newAmountInfo)
-        try? modelContext.save()
-    }
 }
     
+//    private func saveTransaction() {
+//        guard let amountValue = Int(amount) else { return }
+//        let newAmount = AmountInfo(amount: amountValue, memo: memo, category: category, date: date)
+//    }
+    
+    
+    
+//    private func addTransaction(amount: Int) {
+//        let newAmountInfo = AmountInfo(amount: amount, category: selectedCategory, date: selectedDate)
+//        
+//        moneyStatus.amount.append(newAmountInfo)
+//        try? modelContext.save()
+//    }
 
-//#Preview {
-//    AddTransactionView(moneyStatus: MoneyStatus(backingData: <#any BackingData<MoneyStatus>#>),
-                       
-//                       selectedTab: .constant(0))
-//    .modelContainer(for: MoneyStatus.self)
-//}
+    
+#Preview {
+    AddTransactionView(moneyStatus: MoneyStatus(date: Date(), amount: [], budget: 0, targetTime: 1), selectedTab: .constant(0))
+        .modelContainer(for: MoneyStatus.self, inMemory: true)
+}
+
