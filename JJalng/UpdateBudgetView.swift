@@ -80,10 +80,10 @@ struct UpdateBudgetView: View {
             
             Button(action: editBudget) {
                 HStack {
-                    Text("수정하기")
+                    Text("수정")
                         .frame(minWidth: 300)
                         .font(.title2)
-                        .fontWeight(.bold)
+//                        .fontWeight(.bold)
                         .padding()
                         .background(Color.green)
                         .foregroundColor(.white)
@@ -114,7 +114,7 @@ struct UpdateBudgetView: View {
                             Text(selectedOption.rawValue)
                                 .font(.title2)
                                 .foregroundStyle(.black)
-                                .fontWeight(.bold)
+//                                .fontWeight(.bold)
                             Spacer()
                             Image(systemName: "chevron.down")
                                 .foregroundStyle(.black)
@@ -130,10 +130,10 @@ struct UpdateBudgetView: View {
             }
             Button(action: editTargetTime) {
                 HStack {
-                    Text("수정하기")
+                    Text("수정")
                         .frame(minWidth: 300)
                         .font(.title2)
-                        .fontWeight(.bold)
+//                        .fontWeight(.bold)
                         .padding()
                         .background(Color.green)
                         .foregroundColor(.white)
@@ -143,6 +143,7 @@ struct UpdateBudgetView: View {
             }
             Text("기간을 수정하면 시작일이 새롭게 시작됩니다.")
                 .font(.caption)
+                .padding()
             Spacer()
         }
         .padding()
