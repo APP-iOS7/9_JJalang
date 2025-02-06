@@ -48,6 +48,19 @@ struct SlotView: View {
             }
             reelsView
             spinButton
+<<<<<<< HEAD
+=======
+            
+            VStack {
+                Text("남은 예산이...")
+                HStack {
+                    Text("\(moneyStatus.remainingBudget)")
+                        .fontWeight(.bold)
+                    Text("원")
+                }
+            }
+            .padding(.top, 80)
+>>>>>>> dbcf7b5 (버짓 업데이트 시 시분초 수정, 홈뷰 여백수정, 슬롯 뷰 잔액 추가, 경고문 사라지는 애니메이션)
         }
         .padding()
     }
@@ -105,9 +118,6 @@ struct SlotView: View {
         var finalIndex: Int = 0
         
         withAnimation(.interactiveSpring()) {
-            defer {
-                print(finalIndex)
-            }
             offsets = offsets.map { currentOffset in
                 let centeringOffset = itemHeight / 2
                 // 절대값의 음수 부호를 고려한 정확한 인덱스 계산
