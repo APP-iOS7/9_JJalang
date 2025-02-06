@@ -70,7 +70,7 @@ struct ExpenseSection: View {
                         selectedAmount: binding(for: amount)
                     )
                 } label: {
-                    ExpenseRow(memo: money.memo, amount: amount.amount)
+                    ExpenseRow(memo: money.amount[index].memo, amount: amount.amount)
                 }
             }
         }
@@ -129,8 +129,8 @@ struct CalendarView: View {
     }
     
     var filteredMoneyStatus: [MoneyStatus] {
-        moneyStatusList.filter {
-            Calendar.current.isDate($0.date, inSameDayAs: selectedDate)
+        moneyStatusList.filter { _ in
+            Calendar.current.isDate(Date(), inSameDayAs: selectedDate)
         }
     }
     
