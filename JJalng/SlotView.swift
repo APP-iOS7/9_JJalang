@@ -26,9 +26,14 @@ struct SlotView: View {
     
     var body: some View {
         VStack(spacing: 20) {
+            //제목
+            Text("오늘의 랜덤 메뉴는?")
+                .font(.system(size: 40, weight: .bold, design: .rounded))
+                .foregroundColor(Color(red: 0.3, green: 0.9, blue: 0.8))
+            
             // 선택된 아이템 표시
             if let selected = selectedItem {
-                Text("선택된 아이템: \(selected)")
+                Text("오늘의 메뉴: \(selected)")
                     .font(.headline)
                     .padding()
             } else {
@@ -59,12 +64,12 @@ struct SlotView: View {
     // 스핀 버튼 뷰
     private var spinButton: some View {
         Button(action: spin) {
-            Text("스핀")
+            Text("Let's go")
                 .font(.title.bold())
                 .foregroundColor(.white)
                 .padding()
                 .frame(maxWidth: 200)
-                .background(isSpinning ? .gray : .red)
+                .background(isSpinning ? .gray : Color(red: 0.2, green: 0.9, blue: 0.8))
                 .cornerRadius(10)
         }
         // 스핀 중 버튼 비활성화

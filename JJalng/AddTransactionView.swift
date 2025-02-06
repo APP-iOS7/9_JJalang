@@ -100,6 +100,7 @@ struct AddTransactionView: View {
                                     .fill(Color(.systemGray6))
                             )
                     }
+                 
                     
                     // 날짜 선택 박스
                     VStack(alignment: .leading) {
@@ -132,7 +133,7 @@ struct AddTransactionView: View {
                             .background(Color.green)
                             .foregroundColor(.white)
                             .cornerRadius(10)
-                        //                        .shadow(color: .yellow.opacity(0.3), radius: 5, x: 0, y: 3)
+//                                                .shadow(color: .yellow.opacity(0.3), radius: 5, x: 0, y: 3)
                     }
                     .padding(.bottom, 20)
                 }
@@ -146,6 +147,8 @@ struct AddTransactionView: View {
             //                    try? modelContext.save()
             //                }
             //            }
+            
+            
             .navigationDestination(isPresented: $navigateToMemoInput) {
                 MemoInputView(amount: amount, category: selectedCategory, date: selectedDate, selectedTab: $selectedTab)
             }
@@ -153,20 +156,6 @@ struct AddTransactionView: View {
     }
 }
     
-//    private func saveTransaction() {
-//        guard let amountValue = Int(amount) else { return }
-//        let newAmount = AmountInfo(amount: amountValue, memo: memo, category: category, date: date)
-//    }
-    
-    
-    
-//    private func addTransaction(amount: Int) {
-//        let newAmountInfo = AmountInfo(amount: amount, category: selectedCategory, date: selectedDate)
-//        
-//        moneyStatus.amount.append(newAmountInfo)
-//        try? modelContext.save()
-//    }
-
     
 #Preview {
     AddTransactionView(moneyStatus: MoneyStatus(date: Date(), amount: [], budget: 0, targetTime: 1), selectedTab: .constant(0))
