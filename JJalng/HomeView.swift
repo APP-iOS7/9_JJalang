@@ -36,6 +36,7 @@ struct HomeView: View {
                     Text(" ~ ")
                     Text(moneyStatus.formattedperiodTime)
                 }
+                .fontWeight(.semibold)
                 
                 ZStack {
                     Circle()
@@ -62,14 +63,28 @@ struct HomeView: View {
                     }
                     Spacer()
                 }
-                .padding()
-                Text("/ ₩ \(moneyStatus.budget)")
-                    .foregroundColor(.gray)
+                .padding([.top,.bottom], 40)
+                HStack {
+                    Text("\(moneyStatus.remainingBudget) ₩")
+                    Text("/ \(moneyStatus.budget) ₩")
+                        .foregroundColor(.gray)
+                }
+                VStack {
+                    Text(budgetMessage)
+                        .font(.headline)
+                        .foregroundColor(budgetMessageColor)
+                        .padding()
+                        .opacity(isVisible ? 1 : 0)
+                }
+                .onAppear {
+                    isVisible = true
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                        withAnimation {
+                            isVisible = false // 2초 후 Text 숨김
+                        }
+                    }
+                }
                 Spacer()
-                Text(budgetMessage)
-                    .font(.headline)
-                    .foregroundColor(budgetMessageColor)
-                    .padding()
                 Button(action: {
                     SoundManager.shared.playSound(sound: "JJalangSound")
                     showAddTransactionView = true
@@ -90,7 +105,6 @@ struct HomeView: View {
     func progressPercentage() -> CGFloat {
         // 특정 기간 내의 지출만 합산하여 반영
         let filteredSpent = moneyStatus.filteredAmount.reduce(0) { $0 + $1.amount }
-        print(Double(filteredSpent) / Double(moneyStatus.budget))
         return CGFloat(filteredSpent) / CGFloat(moneyStatus.budget)
     }
     // guard moneyStatus.budget > 0 else { return 0 }
