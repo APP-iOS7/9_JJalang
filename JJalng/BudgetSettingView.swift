@@ -85,6 +85,7 @@ struct BudgetSettingView: View {
                     .fontWeight(.bold)
                     .padding(.trailing)
             }
+
             .padding([.leading, .trailing], 40)
             
             
@@ -108,7 +109,9 @@ struct BudgetSettingView: View {
                         Spacer()
                         Text(selectedOption?.rawValue ?? "기간 선택")
                             .font(.body)
+
                             .foregroundStyle(selectedOption?.rawValue == nil ? .gray : .black)
+
 //                            .fontWeight(.bold)
                         Spacer()
                         Image(systemName: "chevron.down")
@@ -134,6 +137,7 @@ struct BudgetSettingView: View {
                         .foregroundColor(.white)
                         .cornerRadius(10)
                 }
+
             }
         }
         .padding()

@@ -223,7 +223,6 @@ struct PickerReel: View {
     let offset: CGFloat               // 오프셋
     let itemHeight: CGFloat           // 각 아이템의 높이
     let maxSpinOffset: CGFloat        // 최대 스핀 오프셋
-    
     // 반복 횟수 계산
     private var numberOfRepeats: Int {
         Int(maxSpinOffset / itemHeight) * 2
