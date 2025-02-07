@@ -14,6 +14,8 @@ struct AddTransactionView: View {
     @State private var selectedDate: Date = Date()
     @State private var selectedCategory: String = ""
     @State private var navigateToMemoInput: Bool = false
+    @State private var snackvarString: String = ""
+    @State private var snackvarToggle: Bool = false
     @Binding var selectedTab: Int
     @Environment(\.dismiss) private var dismiss
 
@@ -103,9 +105,21 @@ struct AddTransactionView: View {
                     Spacer()
                     .padding(120)
                     
+                HStack {
                     Button(action: {
                         if amount != nil {
                             navigateToMemoInput = true
+                        }
+                        else {
+                            withAnimation {
+                                snackvarToggle = true
+                                snackvarString = "예산을 입력하세요."
+                            }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                                withAnimation {
+                                    snackvarToggle = false
+                                }
+                            }
                         }
                     }) {
                         Text("다음")
@@ -116,8 +130,23 @@ struct AddTransactionView: View {
                             .foregroundColor(.white)
                             .cornerRadius(10)
                     }
-//                    .padding(.bottom, 20)
                 }
+                .overlay(
+                    VStack {
+                        if snackvarToggle {
+                            Text(snackvarString)
+                                .fontWeight(.bold)
+                                .padding()
+                                .frame(minWidth: 300)
+                                .background(Color.green)
+                                .foregroundColor(.white)
+                                .cornerRadius(10)
+                                .opacity(snackvarToggle ? 1 : 0)
+                                .offset(y: snackvarToggle ? 0 : 50)
+                                .animation(.spring(response: 0.5, dampingFraction: 0.8), value: snackvarToggle)
+                        }
+                    }
+                )                }
                 .padding()
             }
             .navigationDestination(isPresented: $navigateToMemoInput) {

@@ -184,21 +184,22 @@ struct UpdateBudgetView: View {
     
     
     private func editBudget() {
-        defer {
-            dismiss()
-        }
+//        defer {
+//            dismiss()
+//        }
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
-        
-        if let formattedNumber = formatter.number(from: budgetString) {
-            let newBudget = formattedNumber.intValue
+        let formattedNumber = formatter.number(from: budgetString)
+        let newBudget = formattedNumber?.intValue ?? 0
+        if newBudget > 0 {
             moneyStatus.budget = newBudget
             try? modelContext.save()
             print("예산이 설정되었습니다: \(newBudget)")
+            dismiss()
         } else {
             withAnimation {
                 snackvarToggle = true
-                snackvarString = "유효한 숫자가 아닙니다."
+                snackvarString = "예산을 입력하세요."
             }
             DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
                 withAnimation {
