@@ -39,6 +39,8 @@ struct BudgetSettingView: View {
     @State private var budgetString: String = ""
     @State private var selectedDate: Int = 0
     @State private var selectedOption: BudgetPeriod?
+    @State private var snackvarString: String = ""
+    @State private var snackvarToggle: Bool = false
     @Environment(\.modelContext) private var modelContext
     @Query private var moneyStatusList: [MoneyStatus]
     let moneyStatus: MoneyStatus
@@ -131,12 +133,30 @@ struct BudgetSettingView: View {
                     Text("확인")
                         .frame(minWidth: 300)
                         .font(.headline)
-//                        .fontWeight(.bold)
+                        .fontWeight(.bold)
                         .padding()
                         .background(Color.green)
                         .foregroundColor(.white)
                         .cornerRadius(10)
                 }
+                .overlay(
+                    VStack {
+                        if snackvarToggle {
+                            Text(snackvarString)
+                                .fontWeight(.bold)
+                                .padding()
+                                .frame(minWidth: 300, maxWidth: .infinity)
+                                .background(Color.green.opacity(0.8))
+                                .foregroundColor(.white)
+                                .cornerRadius(10)
+                                .shadow(radius: 5)
+                                .opacity(snackvarToggle ? 1 : 0)
+                                .offset(y: snackvarToggle ? 0 : 50)
+                                .animation(.spring(response: 0.5, dampingFraction: 0.8), value: snackvarToggle)
+                        }
+                    }
+                    , alignment: .bottom
+                )
 
             }
         }
@@ -160,9 +180,27 @@ struct BudgetSettingView: View {
                 try? modelContext.save()
                 print("예산이 설정되었습니다: \(newBudget)")
             } else {
+                withAnimation {
+                    snackvarToggle = true
+                    snackvarString = "유효한 숫자가 아닙니다."
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                    withAnimation {
+                        snackvarToggle = false
+                    }
+                }
                 print("유효한 숫자가 아닙니다.")
             }
         } else {
+            withAnimation {
+                snackvarToggle = true
+                snackvarString = "기간을 선택해 주세요."
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                withAnimation {
+                    snackvarToggle = false
+                }
+            }
             print("기간을 선택해 주세요.")
         }
         
