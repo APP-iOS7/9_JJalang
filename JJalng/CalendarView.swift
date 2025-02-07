@@ -35,9 +35,10 @@ struct ExpenseRow: View {
     let memo: String
     let amount: Int
     let category: String
+    
     var body: some View {
         HStack {
-            HStack{
+            HStack {
                 Text(category == "" ? "📂 기타" : category)
                     .foregroundStyle(.gray)
                     .font(.caption)
@@ -106,7 +107,7 @@ struct ExpenseListView: View {
     
     private func binding(for money: MoneyStatus) -> Binding<MoneyStatus> {
         guard let index = moneyStatusList.firstIndex(where: { $0.id == money.id }) else {
-            return .constant(money) // 기본값 반환
+            return .constant(money)
         }
         return $moneyStatusList[index]
     }
@@ -117,7 +118,7 @@ struct TotalAmountView: View {
     
     var body: some View {
         VStack(alignment: .center, spacing: 8) {
-            Text("총 지출")
+            Text("이 달의 총 지출")
                 .font(.headline)
                 .foregroundColor(.secondary)
             Text("₩\(totalSpent)")
@@ -127,7 +128,6 @@ struct TotalAmountView: View {
         .frame(maxWidth: .infinity)
         .padding()
         .background(Color(.systemBackground))
-//        .shadow(radius: 2)
     }
 }
 
@@ -137,24 +137,26 @@ struct CalendarView: View {
     @Environment(\.modelContext) private var modelContext
     
     var totalSpent: Int {
-        moneyStatusList.flatMap { $0.amount }.reduce(0) { $0 + $1.amount }
+        let calendar = Calendar.current
+        return moneyStatusList.flatMap { $0.amount }
+            .filter { amountInfo in
+                let amountDate = amountInfo.date
+                return calendar.isDate(amountDate, equalTo: selectedDate, toGranularity: .month)
+            }
+            .reduce(0) { $0 + $1.amount }
     }
     
     var filteredMoneyStatus: [MoneyStatus] {
         moneyStatusList.compactMap { moneyStatus in
             let filteredAmounts = moneyStatus.amount.filter { amountInfo in
-                Calendar.current.isDate(amountInfo.date, inSameDayAs: selectedDate) // 선택한 날짜 기준 필터링
+                Calendar.current.isDate(amountInfo.date, inSameDayAs: selectedDate)
             }
-            if filteredAmounts.isEmpty {
-                return nil // 선택한 날짜에 지출이 없으면 제외
-            } else {
-                return MoneyStatus(
-                    date: moneyStatus.date,
-                    amount: filteredAmounts, // 선택한 날짜의 지출만 포함
-                    budget: moneyStatus.budget,
-                    targetTime: moneyStatus.targetTime
-                )
-            }
+            return filteredAmounts.isEmpty ? nil : MoneyStatus(
+                date: moneyStatus.date,
+                amount: filteredAmounts,
+                budget: moneyStatus.budget,
+                targetTime: moneyStatus.targetTime
+            )
         }
     }
     
@@ -174,10 +176,7 @@ struct CalendarView: View {
             DateHeaderView(selectedDate: selectedDate, selectedDateTotal: selectedDateTotal)
             
             ExpenseListView(
-                moneyStatusList: .init(
-                    get: { self.moneyStatusList },
-                    set: { newValue in }
-                ),
+                moneyStatusList: .init(get: { self.moneyStatusList }, set: { newValue in }),
                 filteredMoneyStatus: filteredMoneyStatus
             )
             
