@@ -39,6 +39,8 @@ struct UpdateBudgetView: View {
     @State private var budgetString: String = ""
     @State private var selectedDate: Int = 0
     @State private var selectedOption: BudgetPeriod = .oneWeek
+    @State private var snackvarString: String = ""
+    @State private var snackvarToggle: Bool = false
     @Environment(\.modelContext) private var modelContext
     @Query private var moneyStatusList: [MoneyStatus]
     
@@ -78,19 +80,39 @@ struct UpdateBudgetView: View {
             }
             .padding()
             
-            Button(action: editBudget) {
-                HStack {
-                    Text("수정")
-                        .frame(minWidth: 300)
-                        .font(.title2)
-//                        .fontWeight(.bold)
-                        .padding()
-                        .background(Color.green)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
+            HStack {
+                Button(action: editBudget) {
+                    HStack {
+                        Text("수정")
+                            .frame(minWidth: 300)
+                            .font(.title2)
+                            .fontWeight(.bold)
+                            .padding()
+                            .background(Color.green)
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
+                    }
+                    .frame(width: 400)
                 }
-                .frame(width: 400)
+                .overlay(
+                    VStack {
+                        if snackvarToggle {
+                            Text(snackvarString)
+                                .fontWeight(.bold)
+                                .padding()
+                                .frame(minWidth: 300)
+                                .background(Color.green)
+                                .foregroundColor(.white)
+                                .cornerRadius(10)
+                                .opacity(snackvarToggle ? 1 : 0)
+                                .offset(y: snackvarToggle ? 0 : 50)
+                                .animation(.spring(response: 0.5, dampingFraction: 0.8), value: snackvarToggle)
+                        }
+                    }
+                    //                , alignment: .bottom
+                )
             }
+            
             
             Spacer()
             
@@ -114,7 +136,7 @@ struct UpdateBudgetView: View {
                             Text(selectedOption.rawValue)
                                 .font(.title2)
                                 .foregroundStyle(.black)
-//                                .fontWeight(.bold)
+                            //                                .fontWeight(.bold)
                             Spacer()
                             Image(systemName: "chevron.down")
                                 .foregroundStyle(.black)
@@ -133,7 +155,7 @@ struct UpdateBudgetView: View {
                     Text("수정")
                         .frame(minWidth: 300)
                         .font(.title2)
-//                        .fontWeight(.bold)
+                        .fontWeight(.bold)
                         .padding()
                         .background(Color.green)
                         .foregroundColor(.white)
@@ -155,25 +177,35 @@ struct UpdateBudgetView: View {
             dismiss()
         }
         moneyStatus.targetTime = targetTime
-        moneyStatus.date = Date()
+        moneyStatus.date = Calendar.current.startOfDay(for: Date()) // 오늘 날짜의 00:00:00 를 저장
         try? modelContext.save()
         print("목표기간이 수정되었습니다: \(targetTime)")
     }
-
-
+    
+    
     private func editBudget() {
-        defer {
-            dismiss()
-        }
+//        defer {
+//            dismiss()
+//        }
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
-
-        if let formattedNumber = formatter.number(from: budgetString) {
-            let newBudget = formattedNumber.intValue
+        let formattedNumber = formatter.number(from: budgetString)
+        let newBudget = formattedNumber?.intValue ?? 0
+        if newBudget > 0 {
             moneyStatus.budget = newBudget
             try? modelContext.save()
             print("예산이 설정되었습니다: \(newBudget)")
+            dismiss()
         } else {
+            withAnimation {
+                snackvarToggle = true
+                snackvarString = "예산을 입력하세요."
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                withAnimation {
+                    snackvarToggle = false
+                }
+            }
             print("유효한 숫자가 아닙니다.")
         }
     }
