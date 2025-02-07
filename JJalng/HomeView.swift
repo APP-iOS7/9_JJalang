@@ -13,6 +13,7 @@ struct HomeView: View {
     @State private var tempBudget: String = ""
     @Binding var selectedTab: Int
     @State private var showAddTransactionView = false
+    @State private var isVisible: Bool = false
     
     var body: some View {
         VStack {
