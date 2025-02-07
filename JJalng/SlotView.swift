@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 // 슬롯 머신 메인 뷰 구조체
 struct SlotView: View {
@@ -13,16 +14,22 @@ struct SlotView: View {
         // "산다","안 산다","산다","안 산다","산다","안 산다","산다","안 산다",
         "🍕 피자", "🍔 버거", "🍣 초밥", "🍜 라면", "🥗 샐러드", "🍞 빵", "🥩 스테이크", "🍤 튀김", "🍛 카레", "🥪 샌드위치", "🌭 핫도그", "🥟 만두", "🍚 백반", "🍗 치킨", "🥘 찌개", "🍲 전골", "🥓 삼겹살", "🍖 갈비", "🍢 어묵", "🍙 삼각김밥", "🍝 파스타", "🍳 계란프라이", "🦑 오징어볶음", "🐟 회", "🍜 쌀국수", "🦐 해물탕"]
     
-    init() {
-        self.maxSpinOffset = CGFloat(items.count) * itemHeight
-    }
-
+    
     @State private var selectedItem: String?        // 선택된 아이템을 추적할 상태 변수
     @State private var offsets: [CGFloat] = [0]     // 오프셋 상태 변수 (스크롤 위치)
     @State private var isSpinning = false           // 스핀 중인지 확인하는 상태 변수
     private let itemHeight: CGFloat = 200           // 각 아이템의 높이
     private let spinDuration: Double = 1.5          // 스핀 애니메이션 지속 시간
     private var maxSpinOffset: CGFloat              // 최대 스핀 오프셋 (스크롤 거리)
+    @Environment(\.modelContext) private var modelContext
+    @Query private var moneyStatusList: [MoneyStatus]
+    let moneyStatus: MoneyStatus
+    
+    init(moneyStatus: MoneyStatus) {
+        self.moneyStatus = moneyStatus
+        self.maxSpinOffset = CGFloat(items.count) * itemHeight
+
+    }
     
     var body: some View {
         VStack(spacing: 20) {
@@ -48,8 +55,7 @@ struct SlotView: View {
             }
             reelsView
             spinButton
-<<<<<<< HEAD
-=======
+
             
             VStack {
                 Text("남은 예산이...")
@@ -60,7 +66,6 @@ struct SlotView: View {
                 }
             }
             .padding(.top, 80)
->>>>>>> dbcf7b5 (버짓 업데이트 시 시분초 수정, 홈뷰 여백수정, 슬롯 뷰 잔액 추가, 경고문 사라지는 애니메이션)
         }
         .padding()
     }
@@ -168,5 +173,5 @@ struct PickerReel: View {
 
 
 #Preview {
-    SlotView()
+    SlotView(moneyStatus: MoneyStatus(date: Date(), amount: [], budget: 0, targetTime: 0))
 }

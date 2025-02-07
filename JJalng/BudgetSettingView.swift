@@ -136,8 +136,7 @@ struct BudgetSettingView: View {
                         .foregroundColor(.white)
                         .cornerRadius(10)
                 }
-<<<<<<< HEAD
-=======
+
                 .overlay(
                     VStack {
                         if snackvarToggle {
@@ -157,7 +156,6 @@ struct BudgetSettingView: View {
                     , alignment: .bottom
                 )
 
->>>>>>> c5ed622 (예산설정/예산수정 저장실패 애니메이션 추가)
             }
         }
         .padding()

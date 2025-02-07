@@ -55,6 +55,11 @@ class MoneyStatus {
         return MoneyStatus.dateFormatter.string(from: periodTime)
     }
     
+    var remainingBudget: Int {
+        let totalFilteredSpent = filteredAmount.reduce(0) { $0 + $1.amount }
+        return budget - totalFilteredSpent
+    }
+    
     private static let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "ko_KR")  // 한국 로케일
