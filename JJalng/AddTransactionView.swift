@@ -67,7 +67,7 @@ struct AddTransactionView: View {
                                 RoundedRectangle(cornerRadius: 10)
                                     .fill(Color(.systemGray6))
                             )
-                            .onChange(of: amountString) { newValue in
+                            .onChange(of: amountString) { oldValue, newValue in
                                 // 입력된 문자열에서 숫자만 남깁니다.
                                 let filtered = newValue.filter { $0.isNumber }
                                 
